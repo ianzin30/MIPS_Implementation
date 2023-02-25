@@ -8,9 +8,9 @@ module mux_shift_amt(
 
     always @(*) begin
         case(select)
-            2'b00: out = in_00;
-            2'b01: out = in_01;
-            2'b10: out = in_10;
+            2'b00: out = in_00[4:0];
+            2'b01: out = in_01[4:0];
+            2'b10: out = in_10[4:0];
         endcase
 
     end

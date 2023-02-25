@@ -12,4 +12,8 @@
 
 // Especificação dos Fios
 
+// Fios de Controle
+
+// Fios de Data
+
 // Esppecificação dos módulos
