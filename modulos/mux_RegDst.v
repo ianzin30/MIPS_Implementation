@@ -3,7 +3,7 @@ module mux_RegDst(
     input  wire  [4:0] in_000, // rt
     input  wire  [4:0] in_011, // rd
     input  wire  [4:0] in_100, // rs
-    output wire  [4:0] out;
+    output wire  [4:0] out
 );
 
     always @(*) begin

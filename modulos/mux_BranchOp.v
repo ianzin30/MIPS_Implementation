@@ -4,7 +4,7 @@ module mux_BranchOp(
     input  wire  [31:0] in_01, // ~EQ
     input  wire  [31:0] in_10, // GT
     input  wire  [31:0] in_11, // ~GT
-    output wire  [31:0] out;
+    output wire  [31:0] out
 );
 
     always @(*) begin

@@ -2,7 +2,7 @@ module mux_IorD(
     input  wire  [2:0]  select,
     input  wire  [31:0] in_000, // PC
     input  wire  [31:0] in_001, // ALUOut
-    output wire  [31:0] out;
+    output wire  [31:0] out
 );
 
     always @(*) begin
