@@ -5,9 +5,8 @@ module mux_pc_source(
     input wire [31:0] in_100,  // epc
     input wire        in_101,  // zero
     input wire [31:0] in_110,  // load_size
-
     input wire [3:0]  select,  // pc_source
-    output reg [31:0] out;     
+    output reg [31:0] out
 );
 
     always @(*) begin
@@ -21,6 +20,5 @@ module mux_pc_source(
             3'b110: out = in_110;
             3'b111: out = 32'b0;; 
         endcase
-
     end
 endmodule
