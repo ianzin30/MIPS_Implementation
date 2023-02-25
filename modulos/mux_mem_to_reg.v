@@ -18,7 +18,7 @@ module mux_mem_to_reg(
             4'b0010: out = in_0010;
             4'b0011: out = in_0011;
             4'b0100: out = in_0100;
-            4'b0101: out = 32'b100010101;
+            4'b0101: out = 32'b100010101; // 277 em binário
             4'b0110: out = in_0110;
             4'b0111: out = in_0111;
             4'b1000: out = in_1000;
