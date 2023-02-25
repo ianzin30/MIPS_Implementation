@@ -6,8 +6,8 @@ module mux_alusrca(input wire [31:0] in_0, // registrador a
   
   always@(*) begin
     case (sel)
-      1'b0: out = a;
-      1'b1: out = b;
+      1'b0: out = in_0;
+      1'b1: out = in_1;
     endcase
   end
 endmodule
