@@ -7,7 +7,7 @@
 `include "arquivos_espec/Registrador.vhd"
 `include "arquivos_espec/ula32.vhd"
 
-module cpu(
+module CPU(
     input wire clk,
     input wire reset
 );
