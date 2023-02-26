@@ -1,5 +1,5 @@
 module shift_left_16 (
-  input wire [15:0] in_1; //rd
+  input wire [15:0] in_1; // offset/shamt
   output wire [31:0] extended;
 );
 
