@@ -1,4 +1,4 @@
-module zeroextender8 (
+module zero_extender_8_32 (
     input wire [7:0] in_1,
     output wire [31:0] out
 );
