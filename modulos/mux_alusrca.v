@@ -1,8 +1,9 @@
-module mux_alusrca(input wire [31:0] in_0, // registrador a
-                input wire [31:0] in_1, // registrador b
-                input wire sel,
-                output reg [31:0] out
-                );
+module mux_alusrca(
+    input wire [31:0] in_0, // pc
+    input wire [31:0] in_1, // registrador a
+    input wire sel,
+    output reg [31:0] out
+);
   
   always@(*) begin
     case (sel)
