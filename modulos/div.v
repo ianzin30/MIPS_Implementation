@@ -9,22 +9,26 @@ module div(
     output reg div_zero // sinal para indicar divisão por 0
 );
 
-reg signed [31:0] a; // registrador local do dividendo
-reg signed [31:0] b; // registrador local do divisor
+reg signed [31:0] dividendo; // registrador local do dividendo
+reg signed [31:0] divisor; // registrador local do divisor
 reg signed [31:0] quociente; // registrador do quociente
 reg signed [31:0] resto; // registrador do resto
 reg quociente_negativo; // caso os números tenham sinais diferentes
 reg resto_negativo; // caso o dividendo seja negativo
 integer contador = 31; // contador para iterar pelos bits do número
 
-initial // inicalizar os sinais de output
+initial 
     begin
-        div_zero = 0;
+        div_zero = 0; // inicalizar o div_zero como 0
+        hi = 32'b0; // inicaliza o resto como 0
+        lo = 32'b0; // inicializa o quociente como 0
+        dividendo = A; // carrega o dividendo para o registrador a
+        divisor = B; // carrega o divisor para o registrador b
     end
 
 always @(posedge clk or posedge reset) 
     begin
-        if (reset) // reseta todos os registradores e o contador
+        if (reset == 1) // reseta todos os registradores e o contador
             begin
                 dividendo = 32'b0;
                 divisor = 32'b0;
@@ -35,16 +39,10 @@ always @(posedge clk or posedge reset)
                 div_zero = 0;
                 hi = 32'b0;
                 lo = 32'b0;
-                counter = 0;
+                contador = 0;
             end 
-        if(div_control == 1'b1)
+        if(div_control == 1 && contador > 0)
             begin
-                hi = 32'b0; // inicaliza o resto como 0
-                lo = 32'b0; // inicializa o quociente como 0
-                dividendo = A; // carrega o dividendo para o registrador a;
-                divisor = B; // carrega o divisor para o registrador b;
-                
-                contador = 31;
 
                 if (divisor == 32'b0) // vê se o divisor é 0
                     begin
@@ -78,10 +76,6 @@ always @(posedge clk or posedge reset)
                     end
                 quociente = 32'b0;
                 resto = 32'b0;
-            end
-        else
-            begin
-                div_zero = 0;
             end
         
         resto = (resto << 1); // shift left de 1 bit do resto
