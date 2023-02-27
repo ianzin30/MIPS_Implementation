@@ -33,7 +33,7 @@ always @(posedge clk or posedge reset)
                 contador = 0;
                 B_sig = 0;
             end
-        if(mult_control == 1 && contador < 32)
+        if(mult_control == 1)
             begin
                 B_negativo = (~B + 32'd1); // complemento de 2 de B
                 if ({A[contador], B_sig} == 2'b10) // vê se a concatenação dos bits é 2

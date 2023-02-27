@@ -42,7 +42,7 @@ always @(posedge clk or posedge reset)
                 lo = 32'b0;
                 contador = 0;
             end 
-        if(div_control == 1 && contador == 31)
+        if(div_control == 1)
             begin
 
                 if (divisor == 32'b0) // vê se o divisor é 0
