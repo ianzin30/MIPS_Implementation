@@ -4,7 +4,7 @@ module div(
     input signed [31:0] A, // input A
     input signed [31:0] B, // input B
     output reg signed [31:0] hi,  // registrador com os 32 bits mais significativos
-    output reg signed [31:0] lo, // registrador com os 32 bits menos significativos
+    output reg signed [31:0] lo // registrador com os 32 bits menos significativos
 );
 
 reg signed[63:0] produto; // registrador local com o resultado da multiplicação
@@ -50,7 +50,7 @@ always @(posedge clk or posedge reset)
                     begin
                         if (B == 32'h8000_0000) // 								
                             begin
-                                produto = (~produto + 32'd1)
+                                produto = (~produto + 32'd1);
                             end
                         
                         hi = produto[63:32]; // 32 bits mais significativos
