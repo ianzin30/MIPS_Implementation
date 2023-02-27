@@ -1,7 +1,6 @@
 module div(
     input wire clk, // entrada de clock
     input wire reset, // sinal de reset
-    input wire mult_control, // sinal para iniciar a multiplicação
     input signed [31:0] A, // input A
     input signed [31:0] B, // input B
     output reg signed [31:0] hi,  // registrador com os 32 bits mais significativos
@@ -17,8 +16,8 @@ initial
     begin
         B_sig = 1'b0;
         produto = 64'b0;
-        B_negativo = 32'b0;
         contador = 0;
+        B_negativo = (~B + 32'd1); // complemento de 2 de B
     end
 
 
@@ -33,9 +32,8 @@ always @(posedge clk or posedge reset)
                 contador = 0;
                 B_sig = 0;
             end
-        if(mult_control == 1)
+        if(contador < 32)
             begin
-                B_negativo = (~B + 32'd1); // complemento de 2 de B
                 if ({A[contador], B_sig} == 2'b10) // vê se a concatenação dos bits é 2
                     begin
                         produto[63:32] = produto[63:32] + A_negativo;

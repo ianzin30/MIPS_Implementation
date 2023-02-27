@@ -1,7 +1,6 @@
 module div(
     input wire clk, // entrada de clock
     input wire reset, // sinal de reset
-    input wire div_control, // sinal para iniciar a divisão
     input signed [31:0] A, // input A
     input signed [31:0] B, // input B
     output reg signed [31:0] hi,  // registrador com o resto
@@ -42,7 +41,7 @@ always @(posedge clk or posedge reset)
                 lo = 32'b0;
                 contador = 0;
             end 
-        if(div_control == 1)
+        if(contador == 31)
             begin
 
                 if (divisor == 32'b0) // vê se o divisor é 0
@@ -79,14 +78,17 @@ always @(posedge clk or posedge reset)
                 resto = 32'b0;
             end
         
-        resto = (resto << 1); // shift left de 1 bit do resto
+        if(contador > 0)
+            begin
+                resto = (resto << 1); // shift left de 1 bit do resto
 
-        resto[0] = dividendo[contador]; //  carrega o valor do número atual do dividendo para o resto
+                resto[0] = dividendo[contador]; //  carrega o valor do número atual do dividendo para o resto
 
-        if(resto >= divisor)
-            begin 
-                resto = resto - divisor; // se o resto for maior que o divisor, subtrai o divisor do resto
-                quociente[contador] = 1; // seta o atual dígito do quociente como 1
+                if(resto >= divisor)
+                    begin 
+                        resto = resto - divisor; // se o resto for maior que o divisor, subtrai o divisor do resto
+                        quociente[contador] = 1; // seta o atual dígito do quociente como 1
+                    end
             end
         
         if(contador == 0) // caso a divisão tenha acabado
