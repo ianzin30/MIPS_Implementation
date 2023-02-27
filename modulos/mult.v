@@ -36,11 +36,11 @@ always @(posedge clk or posedge reset)
             begin
                 if ({A[contador], B_sig} == 2'b10) // vê se a concatenação dos bits é 2
                     begin
-                        produto[63:32] = produto[63:32] + A_negativo;
+                        produto[63:32] = produto[63:32] + B_negativo;
                     end
                 else if({A[contador], B_sig} == 2'b01) // vê se a concatenação dos bits é 1
                     begin
-                        produto[63:32] = produto[63:32] + A;
+                        produto[63:32] = produto[63:32] + B;
                     end
                 produto = produto >>> 1; // desloca para a direita preservando sinal
                 B_sig = A[contador]; // atualiza B_sig
