@@ -17,7 +17,7 @@ initial
     begin
         B_sig = 1'b0;
         produto = 64'b0;
-        A_negativo = 32'b0;
+        B_negativo = 32'b0;
         contador = 0;
     end
 
