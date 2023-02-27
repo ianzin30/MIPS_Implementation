@@ -7,7 +7,6 @@ module div(
     output reg signed [31:0] hi,  // registrador com o resto
     output reg signed [31:0] lo, // registrador com o quociente
     output reg div_zero // sinal para indicar divisão por 0
-    output reg div_stop // sinal para indicar que a divisão acabou
 );
 
 reg signed [31:0] a; // registrador local do dividendo
@@ -16,12 +15,10 @@ reg signed [31:0] quociente; // registrador do quociente
 reg signed [31:0] resto; // registrador do resto
 reg quociente_negativo; // caso os números tenham sinais diferentes
 reg resto_negativo; // caso o dividendo seja negativo
-reg div_start; // auxiliar indica que a divisão iniciou
 integer contador = 31; // contador para iterar pelos bits do número
 
 initial // inicalizar os sinais de output
     begin
-        div_stop = 0;
         div_zero = 0;
     end
 
@@ -36,7 +33,6 @@ always @(posedge clk or posedge reset)
                 quociente_negativo = 0;
                 resto_negativo = 0;
                 div_zero = 0;
-                div_start = 0;
                 hi = 32'b0;
                 lo = 32'b0;
                 counter = 0;
@@ -47,7 +43,7 @@ always @(posedge clk or posedge reset)
                 lo = 32'b0; // inicializa o quociente como 0
                 dividendo = A; // carrega o dividendo para o registrador a;
                 divisor = B; // carrega o divisor para o registrador b;
-                div_stop = 0; 
+                
                 contador = 31;
 
                 if (divisor == 32'b0) // vê se o divisor é 0
@@ -57,7 +53,6 @@ always @(posedge clk or posedge reset)
                     end 
                 else 
                     begin
-                        div_start = 1;
                         div_zero = 0;
                     end
                 if (A[31] != B[31]) // checa se o sinal dos números é diferente
@@ -114,11 +109,7 @@ always @(posedge clk or posedge reset)
                                 hi = (~hi + 1); // converte o valor em hi para complemento de 2
                             end
                     end
-                if(div_start == 1) // caso a divisão tenha ocorrido
-                    begin
-                        div_stop = 1; // seta o sinal para indicar que a divisão acabou como 1
-                        div_start = 0; // seta o sinal para indicar que a divisão iniciou como 0
-                    end
+        
 
                 contador = -1; // interrompe o contador
             
