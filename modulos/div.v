@@ -39,7 +39,7 @@ always @(posedge clk or posedge reset)
                 div_zero = 0;
                 hi = 32'b0;
                 lo = 32'b0;
-                contador = 0;
+                contador = 31;
             end 
         if(contador == 31)
             begin
@@ -123,8 +123,10 @@ always @(posedge clk or posedge reset)
             end
         
         
-        contador = contador - 1;
-    
+        if(contador > 0)
+            begin
+                contador = contador - 1;
+            end
 
     end
     
