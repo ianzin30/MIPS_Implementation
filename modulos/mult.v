@@ -1,4 +1,4 @@
-module div(
+module mult(
     input wire clk, // entrada de clock
     input wire reset, // sinal de reset
     input signed [31:0] A, // input A
