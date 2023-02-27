@@ -15,7 +15,7 @@ reg signed [31:0] quociente; // registrador do quociente
 reg signed [31:0] resto; // registrador do resto
 reg quociente_negativo; // caso os números tenham sinais diferentes
 reg resto_negativo; // caso o dividendo seja negativo
-integer contador = 31; // contador para iterar pelos bits do número
+integer contador; // contador para iterar pelos bits do número
 
 initial 
     begin
@@ -24,6 +24,7 @@ initial
         lo = 32'b0; // inicializa o quociente como 0
         dividendo = A; // carrega o dividendo para o registrador a
         divisor = B; // carrega o divisor para o registrador b
+        contador = 31; //seta o contador como 31
     end
 
 always @(posedge clk or posedge reset) 
@@ -41,7 +42,7 @@ always @(posedge clk or posedge reset)
                 lo = 32'b0;
                 contador = 0;
             end 
-        if(div_control == 1 && contador > 0)
+        if(div_control == 1 && contador == 31)
             begin
 
                 if (divisor == 32'b0) // vê se o divisor é 0
