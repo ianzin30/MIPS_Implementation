@@ -1,7 +1,8 @@
-module RegRead(input wire [4:0] in_00, // rs
-               input wire [1:0] sel, // seleção
-               output reg [4:0] out, // output
-                     );
+module RegRead(
+    input wire [4:0] in_00, // rs
+    input wire [1:0] sel, // seleção
+    output reg [4:0] out // output
+);
   
   always@(*) begin
     case (sel)
