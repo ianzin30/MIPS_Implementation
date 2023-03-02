@@ -39,6 +39,8 @@ module CPU(
     wire sel_alusrca;   // sinal do mux alusrca
     wire sel_ir;        // selecionador do Registrador de Instruções
     wire sel_shift_src; // selecionador do mux de shift src
+    wire sel_branchop;  // sinal do mux branchOp
+    wire output_branchop; // saida do mux branchop
     
 
 // Control wires 2 bits
@@ -49,17 +51,17 @@ module CPU(
 // Control wire 3 bits
     wire [2:0]  sel_shift_reg; //sinal para selecionar a operação no shift_reg
 
+
 // Instruction wires
     wire [5:0]  instr31_26;
     wire [4:0]  instr25_21;
     wire [4:0]  instr20_16;
     wire [15:0] instr15_00;
 
-// Data wire de 1 bit
-    wire        alu_lt;
 
 // Data wires 5 bits
     wire [4:0]  out_shift_amt;
+
 
 // Data wires 32 bits
     wire [31:0] PC_Source_out;          // fio que sai do mux pc_source
@@ -88,9 +90,12 @@ module CPU(
 
 
 // Flags
+    wire alu_lt;
+    wire alu_eq;
+    wire alu_gt;
 
 
-
+// registradores
     Registrador PC(
         clk,
         reset,
@@ -147,14 +152,16 @@ module CPU(
         EPC_out
     );
 
-    mux_alusrca mux_alusra(
+
+// multiplexadores
+    mux_alusrca MUX_alusra(
         PC_Out,
         output_a,
         sel_alusrca,
         alusrca_out
     );
 
-    mux_alusrcb mux_alusrb(
+    mux_alusrcb MUX_alusrb(
         output_b,
         sign_extend_16_32_out,
         shift_left_2_out,
@@ -162,6 +169,32 @@ module CPU(
         alusrcb_out
     );
 
+    mux_shift_amt MUX_shift_amt(
+        instr15_00,
+        output_b,
+        // mem -> tem que adicionar a porta
+        sel_shift_amt,
+        out_shift_amt
+    );
+
+    mux_shift_src MUX_shift_src(
+        output_b,
+        output_a,
+        sel_shift_src,
+        output_shift_src
+    );
+
+    mux_BranchOp MUX_branchop(
+        sel_branchop,
+        alu_eq,
+        ~alu_eq,
+        alu_gt,
+        ~alu_gt,
+        output_branchop
+    );
+
+
+// outros componentes
     Memoria MEM(
         IorD_out,
         clk,
@@ -181,21 +214,6 @@ module CPU(
         instr15_00
     );
 
-    mux_shift_amt Mux_shift_amt(
-        instr15_00,
-        output_b,
-        // mem -> tem que adicionar a porta
-        sel_shift_amt,
-        out_shift_amt
-    );
-
-    mux_shift_src Mux_shift_src(
-        output_b,
-        output_a,
-        sel_shift_src,
-        output_shift_src
-    );
-
     RegDesloc ShiftReg(
         clk,
         reset,
@@ -205,7 +223,7 @@ module CPU(
         output_shift
     );
 
-    sing_extend_1_32 zero_extend_1_32(
+    sing_extend_1_32 Zero_extend_1_32(
         alu_lt,
         lt_extended,
     );    

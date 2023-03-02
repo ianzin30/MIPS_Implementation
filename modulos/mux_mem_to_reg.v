@@ -8,7 +8,7 @@ module mux_mem_to_reg(
     input wire [31:0] in_0111, // B(rt)
     input wire [31:0] in_1000, // SignExtend
     input wire [3:0]  select, //Controlado pelo MemtoReg
-    output reg [31:0] out;
+    output reg [31:0] out
 );
 
     always @(*) begin

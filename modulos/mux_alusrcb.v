@@ -1,9 +1,10 @@
-module mux_alusrcb(input wire [31:0] in_00, // Reg_B
-                     input wire [31:0] in_10, // Sign_extend
-                     input wire [31:0] in_11, // shift
-                     input wire [1:0] sel,
-                     output reg [31:0] out
-                     );
+module mux_alusrcb(
+    input wire [31:0] in_00, // Reg_B
+    input wire [31:0] in_10, // Sign_extend
+    input wire [31:0] in_11, // shift
+    input wire [1:0] sel,
+    output reg [31:0] out
+);
   
   always@(*) begin
     case (sel)
