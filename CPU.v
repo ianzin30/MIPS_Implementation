@@ -9,20 +9,20 @@
 
 
 // Inports dos Módulos Criados
-`include "mux_alusrca.v"
-`include "mux_alusrcb.v"
-`include "mux_BranchOp.v"
-`include "mux_IorD.v"
-`include "mux_pc_source.v"
-`include "mux_RegDst.v"
-`include "mux_shift_amt.v"
-`include "mux_shift_src.v"
-`include "RegRead.v"
-`include "shift_left_2.v"
-`include "shift_left_2_PC.v"
-`include "sing_extend_16_32.v"
-`include "sing_extend_1_32.v"
-`include "zero_extend_8_32.v"
+`include "modulos/mux_alusrca.v"
+`include "modulos/mux_alusrcb.v"
+`include "modulos/mux_BranchOp.v"
+`include "modulos/mux_IorD.v"
+`include "modulos/mux_pc_source.v"
+`include "modulos/mux_RegDst.v"
+`include "modulos/mux_shift_amt.v"
+`include "modulos/mux_shift_src.v"
+`include "modulos/RegRead.v"
+`include "modulos/shift_left_2.v"
+`include "modulos/shift_left_2_PC.v"
+`include "modulos/sing_extend_16_32.v"
+`include "modulos/sing_extend_1_32.v"
+`include "modulos/zero_extend_8_32.v"
 
 module CPU(
     input wire clk,
@@ -41,6 +41,7 @@ module CPU(
     wire sel_shift_src; // selecionador do mux de shift src
     wire sel_branchop;  // sinal do mux branchOp
     wire output_branchop; // saida do mux branchop
+    wire regwrite;      // sinal do banco de registradores
     
 
 // Control wires 2 bits
@@ -50,6 +51,7 @@ module CPU(
 
 // Control wire 3 bits
     wire [2:0]  sel_shift_reg; //sinal para selecionar a operação no shift_reg
+    wire [2:0]  sel_mux_iord;  // sinal do mux IorD
 
 
 // Instruction wires
@@ -57,11 +59,14 @@ module CPU(
     wire [4:0]  instr25_21;
     wire [4:0]  instr20_16;
     wire [15:0] instr15_00;
+    wire [25:0] instr25_00;
 
 
 // Data wires 5 bits
     wire [4:0]  out_shift_amt;
-
+    wire [4:0]  regread_out;            // saida do mux regread
+    wire [4:0]  regdst_out;             // saida do mux regdst
+    wire [4:0]  memtoreg_out;           // saida do mux memtoreg
 
 // Data wires 32 bits
     wire [31:0] PC_Source_out;          // fio que sai do mux pc_source
@@ -193,6 +198,13 @@ module CPU(
         output_branchop
     );
 
+    mux_IorD MUX_iord(
+        sel_mux_iord,
+        PC_Out,
+        ALU_out,
+        IorD_out
+    );
+
 
 // outros componentes
     Memoria MEM(
@@ -223,9 +235,37 @@ module CPU(
         output_shift
     );
 
+    Banco_reg BANCO_reg(
+        clk,
+        reset,
+        regwrite,
+        regread_out,
+        instr20_16,
+        regdst_out,
+        memtoreg_out,
+        input_a,
+        input_b
+    );
+
     sing_extend_1_32 Zero_extend_1_32(
         alu_lt,
         lt_extended,
-    );    
+    );
+
+    sing_extend_16_32 Sign_extend_16_32(
+        instr15_00,
+        sign_extend_16_32_out
+    );
+
+    shift_left_2 Shift_left_2(
+        sign_extend_16_32_out,
+        shift_left_2_out
+    );
+
+    shift_left_2_PC Shift_left_2_PC(
+        instr25_00,
+        shift_left_2_pc_out
+    );
+
 
 endmodule
