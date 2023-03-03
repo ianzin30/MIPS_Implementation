@@ -50,8 +50,10 @@ module CPU(
 
 
 // Control wire 3 bits
-    wire [2:0]  sel_shift_reg; //sinal para selecionar a operação no shift_reg
+    wire [2:0]  sel_shift_reg;      //sinal para selecionar a operação no shift_reg
+    wire [2:0]  sel_pc_source;      //sinal para selecionar o mux do pc source
     wire [2:0]  sel_mux_iord;  // sinal do mux IorD
+
 
 
 // Instruction wires
@@ -68,6 +70,9 @@ module CPU(
     wire [4:0]  regdst_out;             // saida do mux regdst
     wire [4:0]  memtoreg_out;           // saida do mux memtoreg
 
+// Data wire de 7 bits
+    wire [7:0] load_size_out;
+
 // Data wires 32 bits
     wire [31:0] PC_Source_out;          // fio que sai do mux pc_source
     wire [31:0] PC_Out;                 // saida do pc
@@ -80,6 +85,7 @@ module CPU(
     wire [31:0] StoreSize_out;          // saida do store size
     wire [31:0] ALU_out;                // saida da ALU
     wire [31:0] ALUOut_Out;             // saida da ALUOut
+    wire [31:0] alu_result;             // saida da alu
     wire [31:0] HiSelect_out;           // saida do mux Hiselect
     wire [31:0] Hi_Out;                 // saida de Hi
     wire [31:0] LoSelect_out;           // saida do mux Loselect
@@ -92,13 +98,15 @@ module CPU(
     wire [31:0] output_shift_src;       // saida do shift_src
     wire [31:0] output_shift;           // saida do ShiftReg
     wire [31:0] lt_extended;            // resultado do LT extendido
+    wire [31:0] load_size_extended;     // resultado do load_size_extendiodo de 8->32
+
 
 
 // Flags
     wire alu_lt;
     wire alu_eq;
     wire alu_gt;
-
+    wire alu_zero;
 
 // registradores
     Registrador PC(
@@ -204,6 +212,17 @@ module CPU(
         ALU_out,
         IorD_out
     );
+    
+    mux_pc_source MUX_pc_source(
+        alu_result,
+        ALUOut_Out,
+        shift_left_2_pc_out,
+        EPC_out,
+        alu_zero,
+        load_size_extended,
+        sel_pc_source,
+        PC_Source_out,
+    );
 
 
 // outros componentes
@@ -252,6 +271,11 @@ module CPU(
         lt_extended,
     );
 
+    zero_extend_8_32 Zero_extend_8_32(
+        load_size_out;
+        load_size_extended;
+    );
+
     sing_extend_16_32 Sign_extend_16_32(
         instr15_00,
         sign_extend_16_32_out
@@ -266,6 +290,5 @@ module CPU(
         instr25_00,
         shift_left_2_pc_out
     );
-
 
 endmodule
