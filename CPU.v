@@ -47,7 +47,8 @@ module CPU(
 
 
 // Control wire 3 bits
-    wire [2:0]  sel_shift_reg; //sinal para selecionar a operação no shift_reg
+    wire [2:0]  sel_shift_reg;      //sinal para selecionar a operação no shift_reg
+    wire [2:0]  sel_pc_source;      //sinal para selecionar o mux do pc source
 
 // Instruction wires
     wire [5:0]  instr31_26;
@@ -57,9 +58,13 @@ module CPU(
 
 // Data wire de 1 bit
     wire        alu_lt;
+    wire        alu_zero;
 
 // Data wires 5 bits
     wire [4:0]  out_shift_amt;
+
+// Data wire de 7 bits
+    wire [7:0] load_size_out;
 
 // Data wires 32 bits
     wire [31:0] PC_Source_out;          // fio que sai do mux pc_source
@@ -73,6 +78,7 @@ module CPU(
     wire [31:0] StoreSize_out;          // saida do store size
     wire [31:0] ALU_out;                // saida da ALU
     wire [31:0] ALUOut_Out;             // saida da ALUOut
+    wire [31:0] alu_result;             // saida da alu
     wire [31:0] HiSelect_out;           // saida do mux Hiselect
     wire [31:0] Hi_Out;                 // saida de Hi
     wire [31:0] LoSelect_out;           // saida do mux Loselect
@@ -85,6 +91,8 @@ module CPU(
     wire [31:0] output_shift_src;       // saida do shift_src
     wire [31:0] output_shift;           // saida do ShiftReg
     wire [31:0] lt_extended;            // resultado do LT extendido
+    wire [31:0] load_size_extended;     // resultado do load_size_extendiodo de 8->32
+
 
 
 // Flags
@@ -208,6 +216,22 @@ module CPU(
     sing_extend_1_32 zero_extend_1_32(
         alu_lt,
         lt_extended,
-    );    
+    );
+
+    zero_extend_8_32 Zero_extend_8_32(
+        load_size_out;
+        load_size_extended;
+    );
+
+    mux_pc_source MUX_pc_source(
+        alu_result,
+        ALUOut_Out,
+        shift_left_2_pc_out,
+        EPC_out,
+        alu_zero,
+        load_size_extended,
+        sel_pc_source,
+        PC_Source_out,
+    );
 
 endmodule

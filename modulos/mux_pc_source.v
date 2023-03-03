@@ -5,7 +5,7 @@ module mux_pc_source(
     input wire [31:0] in_100,  // epc
     input wire        in_101,  // zero
     input wire [31:0] in_110,  // load_size
-    input wire [3:0]  select,  // pc_source
+    input wire [2:0]  select,  // pc_source
     output reg [31:0] out
 );
 
