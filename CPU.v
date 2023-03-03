@@ -279,9 +279,9 @@ module CPU(
         alu_overflow;
         alu_negative;
         alu_zero;
-        alu_lt;
         alu_eq;
-        alu_gt
+        alu_gt;
+        alu_lt
     );
     
     Memoria MEM(
