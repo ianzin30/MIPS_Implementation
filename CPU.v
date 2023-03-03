@@ -27,6 +27,7 @@
 `include "modulos/sing_extend_1_32.v"
 `include "modulos/div.v"
 `include "modulos/mult.v"
+`include "modulos/control_unit.v"
 
 module CPU(
     input wire clk,
@@ -49,6 +50,7 @@ module CPU(
     wire output_branchop; // saida do mux branchop
     wire regwrite;      // sinal do banco de registradores
     wire div_zero;      // indica divisão por 0
+    wire sel_regDst;    // selcionar no mux RegDst
     
 
 // Control wires 2 bits
@@ -59,7 +61,7 @@ module CPU(
 // Control wire 3 bits
     wire [2:0]  sel_shift_reg;      //sinal para selecionar a operação no shift_reg
     wire [2:0]  sel_pc_source;      //sinal para selecionar o mux do pc source
-    wire [2:0]  sel_mux_iord;  // sinal do mux IorD
+    wire [2:0]  sel_mux_iord;       // sinal do mux IorD
 
 
 // Control wire 4 bits
@@ -121,6 +123,7 @@ module CPU(
     wire alu_eq;
     wire alu_gt;
     wire alu_zero;
+    wire alu_overflow;
 
 
 // registradores
@@ -200,7 +203,7 @@ module CPU(
     mux_shift_amt MUX_shift_amt(
         instr15_00,
         output_b,
-        // mem -> tem que adicionar a porta
+        MEM_out,
         sel_shift_amt,
         out_shift_amt
     );
@@ -346,5 +349,43 @@ module CPU(
         MULT_hi_out,
         MULT_lo_out,
     );
+
+    control_unit Control_Unit(
+        // Inputs
+        instr31_26,
+        div_zero,
+        alu_overflow,
+        // Outputs
+
+        // 1bit
+        // PC_Write_Control -> está em falta ////// EM FALTA ////////
+        PC_write,
+        wr,
+        sel_ir,
+        sel_regDst,
+        // Seletor Store Size  //////FALATANTE //////////////////////////////////
+        regwrite,
+        sel_alusrca,
+        sel_branchop,
+        // Seletor Load Size  //////FALATANTE //////////////////////////////////
+        sel_mux_hi,
+        sel_mux_lo,
+        sel_shift_src,
+        EPC_load,
+
+        // 2 bits
+        sel_alusrcb
+        sel_shift_amt,
+        // 3 bits
+        sel_mux_iord,
+        sel_aluop,
+        sel_pc_source,
+        sel_shift_reg,
+
+        // 4 bits
+        sel_mux_mem_to_reg
+    );
+
+
     
 endmodule
