@@ -364,9 +364,8 @@ module CPU(
     );
     
     shift_left_16 Shift_left_16(
-        [15:0] 
-    
-    
-    )
+        instr15_00;
+        shift_left_16_out
+    );
     
 endmodule
