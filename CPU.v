@@ -9,20 +9,20 @@
 
 
 // Inports dos Módulos Criados
-`include "mux_alusrca.v"
-`include "mux_alusrcb.v"
-`include "mux_BranchOp.v"
-`include "mux_IorD.v"
-`include "mux_pc_source.v"
-`include "mux_RegDst.v"
-`include "mux_shift_amt.v"
-`include "mux_shift_src.v"
-`include "RegRead.v"
-`include "shift_left_2.v"
-`include "shift_left_2_PC.v"
-`include "sing_extend_16_32.v"
-`include "sing_extend_1_32.v"
-`include "zero_extend_8_32.v"
+`include "modulos/mux_alusrca.v"
+`include "modulos/mux_alusrcb.v"
+`include "modulos/mux_BranchOp.v"
+`include "modulos/mux_IorD.v"
+`include "modulos/mux_pc_source.v"
+`include "modulos/mux_RegDst.v"
+`include "modulos/mux_shift_amt.v"
+`include "modulos/mux_shift_src.v"
+`include "modulos/RegRead.v"
+`include "modulos/shift_left_2.v"
+`include "modulos/shift_left_2_PC.v"
+`include "modulos/sing_extend_16_32.v"
+`include "modulos/sing_extend_1_32.v"
+`include "modulos/zero_extend_8_32.v"
 
 module CPU(
     input wire clk,
@@ -39,6 +39,9 @@ module CPU(
     wire sel_alusrca;   // sinal do mux alusrca
     wire sel_ir;        // selecionador do Registrador de Instruções
     wire sel_shift_src; // selecionador do mux de shift src
+    wire sel_branchop;  // sinal do mux branchOp
+    wire output_branchop; // saida do mux branchop
+    wire regwrite;      // sinal do banco de registradores
     
 
 // Control wires 2 bits
@@ -49,19 +52,23 @@ module CPU(
 // Control wire 3 bits
     wire [2:0]  sel_shift_reg;      //sinal para selecionar a operação no shift_reg
     wire [2:0]  sel_pc_source;      //sinal para selecionar o mux do pc source
+    wire [2:0]  sel_mux_iord;  // sinal do mux IorD
+
+
 
 // Instruction wires
     wire [5:0]  instr31_26;
     wire [4:0]  instr25_21;
     wire [4:0]  instr20_16;
     wire [15:0] instr15_00;
+    wire [25:0] instr25_00;
 
-// Data wire de 1 bit
-    wire        alu_lt;
-    wire        alu_zero;
 
 // Data wires 5 bits
     wire [4:0]  out_shift_amt;
+    wire [4:0]  regread_out;            // saida do mux regread
+    wire [4:0]  regdst_out;             // saida do mux regdst
+    wire [4:0]  memtoreg_out;           // saida do mux memtoreg
 
 // Data wire de 7 bits
     wire [7:0] load_size_out;
@@ -96,9 +103,12 @@ module CPU(
 
 
 // Flags
+    wire alu_lt;
+    wire alu_eq;
+    wire alu_gt;
+    wire alu_zero;
 
-
-
+// registradores
     Registrador PC(
         clk,
         reset,
@@ -155,14 +165,16 @@ module CPU(
         EPC_out
     );
 
-    mux_alusrca mux_alusra(
+
+// multiplexadores
+    mux_alusrca MUX_alusra(
         PC_Out,
         output_a,
         sel_alusrca,
         alusrca_out
     );
 
-    mux_alusrcb mux_alusrb(
+    mux_alusrcb MUX_alusrb(
         output_b,
         sign_extend_16_32_out,
         shift_left_2_out,
@@ -170,6 +182,50 @@ module CPU(
         alusrcb_out
     );
 
+    mux_shift_amt MUX_shift_amt(
+        instr15_00,
+        output_b,
+        // mem -> tem que adicionar a porta
+        sel_shift_amt,
+        out_shift_amt
+    );
+
+    mux_shift_src MUX_shift_src(
+        output_b,
+        output_a,
+        sel_shift_src,
+        output_shift_src
+    );
+
+    mux_BranchOp MUX_branchop(
+        sel_branchop,
+        alu_eq,
+        ~alu_eq,
+        alu_gt,
+        ~alu_gt,
+        output_branchop
+    );
+
+    mux_IorD MUX_iord(
+        sel_mux_iord,
+        PC_Out,
+        ALU_out,
+        IorD_out
+    );
+    
+    mux_pc_source MUX_pc_source(
+        alu_result,
+        ALUOut_Out,
+        shift_left_2_pc_out,
+        EPC_out,
+        alu_zero,
+        load_size_extended,
+        sel_pc_source,
+        PC_Source_out,
+    );
+
+
+// outros componentes
     Memoria MEM(
         IorD_out,
         clk,
@@ -189,21 +245,6 @@ module CPU(
         instr15_00
     );
 
-    mux_shift_amt Mux_shift_amt(
-        instr15_00,
-        output_b,
-        // mem -> tem que adicionar a porta
-        sel_shift_amt,
-        out_shift_amt
-    );
-
-    mux_shift_src Mux_shift_src(
-        output_b,
-        output_a,
-        sel_shift_src,
-        output_shift_src
-    );
-
     RegDesloc ShiftReg(
         clk,
         reset,
@@ -213,7 +254,19 @@ module CPU(
         output_shift
     );
 
-    sing_extend_1_32 zero_extend_1_32(
+    Banco_reg BANCO_reg(
+        clk,
+        reset,
+        regwrite,
+        regread_out,
+        instr20_16,
+        regdst_out,
+        memtoreg_out,
+        input_a,
+        input_b
+    );
+
+    sing_extend_1_32 Zero_extend_1_32(
         alu_lt,
         lt_extended,
     );
@@ -223,15 +276,19 @@ module CPU(
         load_size_extended;
     );
 
-    mux_pc_source MUX_pc_source(
-        alu_result,
-        ALUOut_Out,
-        shift_left_2_pc_out,
-        EPC_out,
-        alu_zero,
-        load_size_extended,
-        sel_pc_source,
-        PC_Source_out,
+    sing_extend_16_32 Sign_extend_16_32(
+        instr15_00,
+        sign_extend_16_32_out
+    );
+
+    shift_left_2 Shift_left_2(
+        sign_extend_16_32_out,
+        shift_left_2_out
+    );
+
+    shift_left_2_PC Shift_left_2_PC(
+        instr25_00,
+        shift_left_2_pc_out
     );
 
 endmodule
