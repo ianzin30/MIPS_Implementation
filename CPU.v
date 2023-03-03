@@ -25,7 +25,6 @@
 `include "modulos/shift_left_2_PC.v"
 `include "modulos/sing_extend_16_32.v"
 `include "modulos/sing_extend_1_32.v"
-`include "modulos/zero_extend_8_32.v"
 `include "modulos/div.v"
 `include "modulos/mult.v"
 
@@ -82,9 +81,6 @@ module CPU(
     wire [4:0]  memtoreg_out;           // saida do mux memtoreg
 
 
-// Data wire de 7 bits
-    wire [7:0] load_size_out;
-
 
 // Data wires 32 bits
     wire [31:0] PC_Source_out;          // fio que sai do mux pc_source
@@ -118,7 +114,6 @@ module CPU(
     wire [31:0] MULT_lo_out;             // saída LO da mult
     wire [31:0] load_size_out;          // saída do load size
     wire [31:0] shift_left_16_out;      // saída do shift left 16
-    wire [31:0] load_size_extended;     // resultado do load_size_extendiodo de 8->32
 
 
 // Flags
@@ -239,7 +234,7 @@ module CPU(
         shift_left_2_pc_out,
         EPC_out,
         alu_zero,
-        load_size_extended,
+        load_size_out,
         sel_pc_source,
         PC_Source_out,
     );
@@ -316,11 +311,6 @@ module CPU(
     sing_extend_1_32 Zero_extend_1_32(
         alu_lt,
         lt_extended,
-    );
-
-    zero_extend_8_32 Zero_extend_8_32(
-        load_size_out;
-        load_size_extended;
     );
 
     sing_extend_16_32 Sign_extend_16_32(
