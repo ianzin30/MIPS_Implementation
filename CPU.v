@@ -352,38 +352,46 @@ module CPU(
 
     control_unit Control_Unit(
         // Inputs
-        instr31_26,
-        div_zero,
-        alu_overflow,
+        .clk(clk),
+        .reset(reset),
+        // Instruções
+        .input_op(instr31_26),
+        // Flags
+        .div_zero(div_zero),
+        .overflow(alu_overflow),
+
         // Outputs
-
-        // 1bit
-        // PC_Write_Control -> está em falta ////// EM FALTA ////////
-        PC_write,
-        wr,
-        sel_ir,
-        sel_regDst,
-        // Seletor Store Size  //////FALATANTE //////////////////////////////////
-        regwrite,
-        sel_alusrca,
-        sel_branchop,
-        // Seletor Load Size  //////FALATANTE //////////////////////////////////
-        sel_mux_hi,
-        sel_mux_lo,
-        sel_shift_src,
-        EPC_load,
-
-        // 2 bits
-        sel_alusrcb
-        sel_shift_amt,
-        // 3 bits
-        sel_mux_iord,
-        sel_aluop,
-        sel_pc_source,
-        sel_shift_reg,
-
-        // 4 bits
-        sel_mux_mem_to_reg
+        // Operações
+        .sel_aluop(sel_aluop),
+        .sel_shift_reg(sel_shift_reg),
+        // Registradores
+        .sel_alusrcb(sel_alusrcb),
+        .sel_alusrca(sel_alusrca),
+        .AB_load(AB_load),
+        .wr(wr),        
+        .sel_regDst(sel_regDst), 
+        .regwrite(regwrite),   
+        .sel_ir(sel_ir),     
+        .EPC_load(EPC_load),   
+        .aluout_load(aluout_load),
+        .HiLo_load(HiLo_load),
+        // PC Write
+        .PC_Write_Cond() ///Tem dois PC Write os dois são usados?
+        .PC_write(PC_write),
+        // Muxes
+        .sel_mux_mem_to_reg(sel_mux_mem_to_reg,),
+        .sel_mux_iord(sel_mux_iord)
+        .sel_pc_source(sel_pc_source),     
+        .sel_shift_amt(sel_shift_amt),     
+        .sel_shift_src(sel_shift_src),     
+        .sel_branchop(sel_branchop),      
+        .sel_mux_hi(sel_mux_hi),        
+        .sel_mux_lo(sel_mux_lo),        
+        // Size Operatios /////////////////// Caio coloca aqui as tuas coisas////////////////////
+        .ls_control_1(),
+        .ls_control_2(),
+        .ss_control_1(),
+        .ss_control_2()
     );
 
 
