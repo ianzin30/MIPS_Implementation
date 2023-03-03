@@ -27,6 +27,7 @@
 `include "modulos/sing_extend_1_32.v"
 `include "modulos/div.v"
 `include "modulos/mult.v"
+`include "modulos/shift_left_16.v"
 
 module CPU(
     input wire clk,
@@ -60,6 +61,7 @@ module CPU(
     wire [2:0]  sel_shift_reg;      //sinal para selecionar a operação no shift_reg
     wire [2:0]  sel_pc_source;      //sinal para selecionar o mux do pc source
     wire [2:0]  sel_mux_iord;  // sinal do mux IorD
+    wire [2:0]  sel_aluop;          // seletor ula
 
 
 // Control wire 4 bits
@@ -121,6 +123,8 @@ module CPU(
     wire alu_eq;
     wire alu_gt;
     wire alu_zero;
+    wire alu_overflow;
+    wire alu_negative;
 
 
 // registradores
@@ -266,8 +270,20 @@ module CPU(
         memtoreg_out
     );
 
-
 // outros componentes
+    ula32 ULA(
+        alusrca_out;
+        alusrcb_out;
+        sel_aluop;
+        ALU_out;
+        alu_overflow;
+        alu_negative;
+        alu_zero;
+        alu_eq;
+        alu_gt;
+        alu_lt
+    );
+    
     Memoria MEM(
         IorD_out,
         clk,
@@ -345,6 +361,11 @@ module CPU(
         output_b,
         MULT_hi_out,
         MULT_lo_out,
+    );
+    
+    shift_left_16 Shift_left_16(
+        instr15_00;
+        shift_left_16_out
     );
     
 endmodule
