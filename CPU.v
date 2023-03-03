@@ -27,6 +27,7 @@
 `include "modulos/sing_extend_1_32.v"
 `include "modulos/div.v"
 `include "modulos/mult.v"
+`include "modulos/control_unit.v"
 `include "modulos/shift_left_16.v"
 
 module CPU(
@@ -50,6 +51,7 @@ module CPU(
     wire output_branchop; // saida do mux branchop
     wire regwrite;      // sinal do banco de registradores
     wire div_zero;      // indica divisão por 0
+    wire sel_regDst;    // selcionar no mux RegDst
     
 
 // Control wires 2 bits
@@ -60,7 +62,7 @@ module CPU(
 // Control wire 3 bits
     wire [2:0]  sel_shift_reg;      //sinal para selecionar a operação no shift_reg
     wire [2:0]  sel_pc_source;      //sinal para selecionar o mux do pc source
-    wire [2:0]  sel_mux_iord;  // sinal do mux IorD
+    wire [2:0]  sel_mux_iord;       // sinal do mux IorD
     wire [2:0]  sel_aluop;          // seletor ula
 
 
@@ -204,7 +206,7 @@ module CPU(
     mux_shift_amt MUX_shift_amt(
         instr15_00,
         output_b,
-        // mem -> tem que adicionar a porta
+        MEM_out,
         sel_shift_amt,
         out_shift_amt
     );
@@ -362,6 +364,52 @@ module CPU(
         MULT_hi_out,
         MULT_lo_out,
     );
+
+    control_unit Control_Unit(
+        // Inputs
+        .clk(clk),
+        .reset(reset),
+        // Instruções
+        .input_op(instr31_26),
+        // Flags
+        .div_zero(div_zero),
+        .overflow(alu_overflow),
+
+        // Outputs
+        // Operações
+        .sel_aluop(sel_aluop),
+        .sel_shift_reg(sel_shift_reg),
+        // Registradores
+        .sel_alusrcb(sel_alusrcb),
+        .sel_alusrca(sel_alusrca),
+        .AB_load(AB_load),
+        .wr(wr),        
+        .sel_regDst(sel_regDst), 
+        .regwrite(regwrite),   
+        .sel_ir(sel_ir),     
+        .EPC_load(EPC_load),   
+        .aluout_load(aluout_load),
+        .HiLo_load(HiLo_load),
+        // PC Write
+        .PC_Write_Cond() ///Tem dois PC Write os dois são usados?
+        .PC_write(PC_write),
+        // Muxes
+        .sel_mux_mem_to_reg(sel_mux_mem_to_reg,),
+        .sel_mux_iord(sel_mux_iord)
+        .sel_pc_source(sel_pc_source),     
+        .sel_shift_amt(sel_shift_amt),     
+        .sel_shift_src(sel_shift_src),     
+        .sel_branchop(sel_branchop),      
+        .sel_mux_hi(sel_mux_hi),        
+        .sel_mux_lo(sel_mux_lo),        
+        // Size Operatios /////////////////// Caio coloca aqui as tuas coisas////////////////////
+        .ls_control_1(),
+        .ls_control_2(),
+        .ss_control_1(),
+        .ss_control_2()
+    );
+
+
     
     shift_left_16 Shift_left_16(
         instr15_00;
