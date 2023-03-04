@@ -21,7 +21,6 @@ control_unit(
     output wire        sel_alusrca,   // Selecionar entrada do registrador A
     output wire        AB_load,
     output wire        wr,            // MemRead or MemWrite
-    output wire        sel_regDst,    // Selecionar registrador destino
     output wire        regwrite,      // Selecionar Registrador Central
     output wire        sel_ir,        // Selecionar instrução
     output wire        EPC_load,      // sinal para carregar no EPC
@@ -29,13 +28,15 @@ control_unit(
     output wire        HiLo_load,
 
     // PC Write
-    output wire        PC_WriteCond,  // Falta na CPU
+    output wire        PC_WriteCond,  // oi rubens
     output wire        PC_write,      // PC_Write
     
     // Muxes
     output wire [3:0]  sel_mux_mem_to_reg,
     output wire [2:0]  sel_mux_iord,
     output wire [2:0]  sel_pc_source,       // Selecionar mux do pc_source
+    output wire [2:0]  sel_regDst,          // Selecionar registrador destino
+    output wire [1:0]  sel_regread          // sinal do mux regread
     output wire [1:0]  sel_shift_amt,       //Selecionar a porta da qnt a deslocar
     output wire        sel_shift_src,       // sinal do shift src
     output wire        sel_branchop,        // Selecionar a operação a Branch

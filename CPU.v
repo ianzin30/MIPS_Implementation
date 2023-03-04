@@ -45,18 +45,19 @@ module CPU(
     wire sel_alusrca;   // sinal do mux alusrca
     wire sel_ir;        // selecionador do Registrador de Instruções
     wire sel_shift_src; // selecionador do mux de shift src
-    wire sel_branchop;  // sinal do mux branchOp
     wire sel_mux_hi;    // sinal do mux hi select
     wire sel_mux_lo;    // sinal do mux lo select
     wire output_branchop; // saida do mux branchop
     wire regwrite;      // sinal do banco de registradores
     wire div_zero;      // indica divisão por 0
-    wire sel_regDst;    // selcionar no mux RegDst
+    wire PC_Write_Cond;
     
 
 // Control wires 2 bits
     wire [1:0] sel_alusrcb;    // sinal do mux alusrcb
     wire [1:0] sel_shift_amt;  // sinal para selecionar o valor a deslocar
+    wire [1:0] sel_regread;    // sinal do mux regread
+    wire [1:0] sel_branchop;  // sinal do mux branchOp
 
 
 // Control wire 3 bits
@@ -64,6 +65,7 @@ module CPU(
     wire [2:0]  sel_pc_source;      //sinal para selecionar o mux do pc source
     wire [2:0]  sel_mux_iord;       // sinal do mux IorD
     wire [2:0]  sel_aluop;          // seletor ula
+    wire [2:0]  sel_regDst;    // selcionar no mux RegDst
 
 
 // Control wire 4 bits
@@ -76,6 +78,7 @@ module CPU(
     wire [4:0]  instr20_16;
     wire [15:0] instr15_00;
     wire [25:0] instr25_00;
+    wire [4:0]  instr15_11;
 
 
 // Data wires 5 bits
@@ -83,7 +86,6 @@ module CPU(
     wire [4:0]  regread_out;            // saida do mux regread
     wire [4:0]  regdst_out;             // saida do mux regdst
     wire [4:0]  memtoreg_out;           // saida do mux memtoreg
-
 
 
 // Data wires 32 bits
@@ -128,12 +130,17 @@ module CPU(
     wire alu_overflow;
     wire alu_negative;
 
+// sinal do pc
+wire PC_SIGNAL;
+wire branchwrite;
+and BranchOut(branchwrite, output_branchop, PC_Write_Cond);
+or BranchorPc(PC_SIGNAL, PC_write, branchwrite);
 
 // registradores
     Registrador PC(
         clk,
         reset,
-        PC_write,
+        PC_SIGNAL,
         PC_Source_out,
         PC_Out
     );
@@ -272,6 +279,20 @@ module CPU(
         memtoreg_out
     );
 
+    mux_RegDst MUX_RegDst(
+        sel_regDst,
+        instr25_21,
+        instr20_16,
+        instr15_11,
+        regdst_out
+    );
+
+    RegRead MUX_RegRead(
+        instr25_21,
+        sel_regread,
+        regread_out
+    );
+
 // outros componentes
     ula32 ULA(
         alusrca_out;
@@ -385,13 +406,14 @@ module CPU(
         .AB_load(AB_load),
         .wr(wr),        
         .sel_regDst(sel_regDst), 
+        .sel_regread(sel_regread),
         .regwrite(regwrite),   
         .sel_ir(sel_ir),     
         .EPC_load(EPC_load),   
         .aluout_load(aluout_load),
         .HiLo_load(HiLo_load),
         // PC Write
-        .PC_Write_Cond() ///Tem dois PC Write os dois são usados?
+        .PC_Write_Cond(PC_Write_Cond)
         .PC_write(PC_write),
         // Muxes
         .sel_mux_mem_to_reg(sel_mux_mem_to_reg,),
