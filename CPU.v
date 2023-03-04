@@ -42,6 +42,11 @@ module CPU(
     wire sel_branchop;  // sinal do mux branchOp
     wire output_branchop; // saida do mux branchop
     wire regwrite;      // sinal do banco de registradores
+    wire MDR_load;      // sinal do MDR
+    wire LSControl1;    // primeiro sinal do Load Size
+    wire LSControl2;    // segundo sinal do Load Size
+    wire SSControl1;    // primeiro sinal do Store Size
+    wire SSControl2;    // segundo sinal do Store Size
     
 
 // Control wires 2 bits
@@ -92,6 +97,9 @@ module CPU(
     wire [31:0] output_shift_src;       // saida do shift_src
     wire [31:0] output_shift;           // saida do ShiftReg
     wire [31:0] lt_extended;            // resultado do LT extendido
+    wire [31:0] MDR_out;                // saída do MDR
+    wire [31:0] LS_out;                 // saída do Load Size
+    wire [31:0] SS_out;                 // saída do Store Size
 
 
 // Flags
@@ -156,7 +164,15 @@ module CPU(
         ALU_out,
         EPC_out
     );
-
+    
+    Registrador MDR(
+        clk,
+        reset,
+        MDR_load,
+        MEM_out,
+        MDR_out
+    );
+        
 
 // multiplexadores
     mux_alusrca MUX_alusra(
@@ -265,6 +281,21 @@ module CPU(
     shift_left_2_PC Shift_left_2_PC(
         instr25_00,
         shift_left_2_pc_out
+    );
+    
+    loadSize Load_Size(
+        LSControl1,
+        LSControl2,
+        MDR_out,
+        LS_out
+    );
+    
+    storeSize Store_Size(
+        SSControl1,
+        SSControl2,
+        output_b,
+        MDR_out,
+        SS_out
     );
 
 
