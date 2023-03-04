@@ -6,7 +6,7 @@ control_unit(
 
     // Instruções
     input wire [5:0]  input_op,
-
+    input wire [5:0]  input_funct,
     // Flags
     input wire        div_zero,
     input wire        overflow,
@@ -51,8 +51,3 @@ control_unit(
 
 //States
 
-// R Istructions
-
-// I Instructions 
-
-// J Istructions
