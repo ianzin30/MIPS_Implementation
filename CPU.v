@@ -97,7 +97,7 @@ module CPU(
     wire [31:0] output_shift_src;       // saida do shift_src
     wire [31:0] output_shift;           // saida do ShiftReg
     wire [31:0] lt_extended;            // resultado do LT extendido
-
+    wire [31:0] MDR_out;                // saída do MDR
 
 // Flags
     wire alu_lt;
