@@ -36,6 +36,7 @@ module CPU(
 );
 
 // Control wires 1 bit
+    wire sel_regread;    // sinal do mux regread
     wire PC_write;
     wire wr;            // sinal da memoria
     wire AB_load;       // sinal para escrever em A e B
@@ -65,7 +66,6 @@ module CPU(
 // Control wires 2 bits
     wire [1:0] sel_alusrcb;    // sinal do mux alusrcb
     wire [1:0] sel_shift_amt;  // sinal para selecionar o valor a deslocar
-    wire [1:0] sel_regread;    // sinal do mux regread
     wire [1:0] sel_branchop;  // sinal do mux branchOp
 
 
@@ -434,9 +434,11 @@ or BranchorPc(PC_SIGNAL, PC_write, branchwrite);
         // Inputs
         .clk(clk),
         .reset(reset),
+
         // Instruções
         .input_op(instr31_26),
-        .input_funct(instr15_00[5:0])
+        .input_funct(instr15_00[5:0]),
+
         // Flags
         .div_zero(div_zero),
         .overflow(alu_overflow),
@@ -445,6 +447,7 @@ or BranchorPc(PC_SIGNAL, PC_write, branchwrite);
         // Operações
         .sel_aluop(sel_aluop),
         .sel_shift_reg(sel_shift_reg),
+
         // Registradores
         .sel_alusrcb(sel_alusrcb),
         .sel_alusrca(sel_alusrca),
@@ -457,9 +460,12 @@ or BranchorPc(PC_SIGNAL, PC_write, branchwrite);
         .EPC_load(EPC_load),   
         .aluout_load(aluout_load),
         .HiLo_load(HiLo_load),
+        .MDR_load(MDR_load),
+        
         // PC Write
         .PC_Write_Cond(PC_Write_Cond)
         .PC_write(PC_write),
+
         // Muxes
         .sel_mux_mem_to_reg(sel_mux_mem_to_reg,),
         .sel_mux_iord(sel_mux_iord)
@@ -469,7 +475,8 @@ or BranchorPc(PC_SIGNAL, PC_write, branchwrite);
         .sel_branchop(sel_branchop),      
         .sel_mux_hi(sel_mux_hi),        
         .sel_mux_lo(sel_mux_lo),        
-        // Size Operatios /////////////////// Caio coloca aqui as tuas coisas////////////////////
+        
+        // Size Operatios
         .ls_control_1(LSControl1),
         .ls_control_2(LSControl2),
         .ss_control_1(SSControl1),
