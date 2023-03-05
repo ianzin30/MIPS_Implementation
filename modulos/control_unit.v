@@ -188,6 +188,7 @@ parameter ST_LB = 6'd61;
 parameter ST_SW = 6'd62;
 parameter ST_SH = 6'd63;
 parameter ST_SB = 6'd64;
+parameter ST_decode3 = 6'd65;
 
 reg [5:0] STATE;
 reg [6:0] COUNTER;
@@ -232,8 +233,8 @@ always @(posedge clk) begin
         case(STATE)
             ST_fetch1:begin
                 STATE = ST_fetch2;
-                wr = 0;
                 sel_mux_iord = 3'b0;
+                wr = 0;
             end
             ST_fetch2:begin
                 STATE = ST_decode1;
@@ -247,8 +248,13 @@ always @(posedge clk) begin
                 STATE = ST_decode2;
                 sel_ir = 1;
                 sel_regread = 0;
+                regwrite = 0;
             end
             ST_decode2:begin
+                STATE = ST_decode3;
+                AB_load = 1;
+            end
+            ST_decode3:begin
                 sel_alusrca = 0;
                 sel_alusrcb = 2'b11;
                 sel_aluop = 3'b001;
