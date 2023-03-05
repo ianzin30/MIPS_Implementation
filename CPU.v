@@ -49,6 +49,11 @@ module CPU(
     wire sel_mux_lo;    // sinal do mux lo select
     wire output_branchop; // saida do mux branchop
     wire regwrite;      // sinal do banco de registradores
+    wire MDR_load;      // sinal do MDR
+    wire LSControl1;    // primeiro sinal do Load Size
+    wire LSControl2;    // segundo sinal do Load Size
+    wire SSControl1;    // primeiro sinal do Store Size
+    wire SSControl2;    // segundo sinal do Store Size
     wire div_zero;      // indica divisão por 0
     wire PC_Write_Cond;
     
@@ -114,6 +119,7 @@ module CPU(
     wire [31:0] output_shift_src;       // saida do shift_src
     wire [31:0] output_shift;           // saida do ShiftReg
     wire [31:0] lt_extended;            // resultado do LT extendido
+    wire [31:0] MDR_out;                // saída do MDR
     wire [31:0] DIV_hi_out;             // saída HI da div
     wire [31:0] DIV_lo_out;             // saída LO da div
     wire [31:0] MULT_hi_out;            // saída HI da mult
@@ -192,7 +198,15 @@ or BranchorPc(PC_SIGNAL, PC_write, branchwrite);
         ALU_out,
         EPC_out
     );
-
+    
+    Registrador MDR(
+        clk,
+        reset,
+        MDR_load,
+        MEM_out,
+        MDR_out
+    );
+        
 
 // multiplexadores
     mux_alusrca MUX_alusra(
@@ -366,6 +380,21 @@ or BranchorPc(PC_SIGNAL, PC_write, branchwrite);
         instr25_00,
         shift_left_2_pc_out
     );
+    
+    loadSize Load_Size(
+        LSControl1,
+        LSControl2,
+        MDR_out,
+        load_size_out
+    );
+    
+    storeSize Store_Size(
+        SSControl1,
+        SSControl2,
+        output_b,
+        MDR_out,
+        StoreSize_out
+    );
 
     div DIV(
         clk,
@@ -386,12 +415,20 @@ or BranchorPc(PC_SIGNAL, PC_write, branchwrite);
         MULT_lo_out,
     );
 
+    shift_left_16 Shift_left_16(
+        instr15_00;
+        shift_left_16_out
+    );
+
+
+// unidade de controle
     control_unit Control_Unit(
         // Inputs
         .clk(clk),
         .reset(reset),
         // Instruções
         .input_op(instr31_26),
+        .input_funct(instr15_00[5:0])
         // Flags
         .div_zero(div_zero),
         .overflow(alu_overflow),
@@ -425,17 +462,10 @@ or BranchorPc(PC_SIGNAL, PC_write, branchwrite);
         .sel_mux_hi(sel_mux_hi),        
         .sel_mux_lo(sel_mux_lo),        
         // Size Operatios /////////////////// Caio coloca aqui as tuas coisas////////////////////
-        .ls_control_1(),
-        .ls_control_2(),
-        .ss_control_1(),
-        .ss_control_2()
-    );
-
-
-    
-    shift_left_16 Shift_left_16(
-        instr15_00;
-        shift_left_16_out
+        .ls_control_1(LSControl1),
+        .ls_control_2(LSControl2),
+        .ss_control_1(SSControl1),
+        .ss_control_2(SSControl2)
     );
     
 endmodule

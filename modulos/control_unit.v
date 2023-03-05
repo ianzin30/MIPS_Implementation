@@ -6,7 +6,7 @@ control_unit(
 
     // Instruções
     input wire [5:0]  input_op,
-
+    input wire [5:0]  input_funct,
     // Flags
     input wire        div_zero,
     input wire        overflow,
@@ -50,10 +50,48 @@ control_unit(
     output wire        ss_control_2,    // Seletor do Store Size
 );
 
-//States
+
+// Opcode Parameters
 
 // R Istructions
+parameter R_OPCODE = 6'h0;
+parameter FUN_ADD      = 6'h20;
+parameter FUN_AND      = 6'h24;
+parameter FUN_DIV      = 6'h1a;
+parameter FUN_MULT     = 6'h18;
+parameter FUN_JR       = 6'h8;
+parameter FUN_MFHI     = 6'h10;
+parameter FUN_MFLO     = 6'h12;
+parameter FUN_SLL      = 6'h0;
+parameter FUN_SLLV     = 6'h4;
+parameter FUN_SLT      = 6'h2a;
+parameter FUN_SRA      = 6'h3;
+parameter FUN_SRAV     = 6'h7;
+parameter FUN_SRL      = 6'h2;
+parameter FUN_SUB      = 6'h22;
+parameter FUN_BREAK    = 6'hd;
+parameter FUN_RTE      = 6'h13
+parameter FUN_XCHG     = 6'h5;
 
 // I Instructions 
+parameter ADDI     = 6'h8;
+parameter ADDIU    = 6'h9;
+parameter BEQ      = 6'h4;
+parameter BNE      = 6'h5;
+parameter BLE      = 6'h6;
+parameter BGT      = 6'h7;
+parameter SRAM     = 6'h1;
+parameter LB       = 6'h20;
+parameter LH       = 6'h21;
+parameter LUI      = 6'hf;
+parameter LW       = 6'h23;
+parameter SB       = 6'h28;
+parameter SH       = 6'h29;
+parameter SLTI     = 6'ha;
+parameter SW       = 6'h2b;
 
 // J Istructions
+parameter J        = 6'h2;
+parameter JAL      = 6'h3;
+
+//States
