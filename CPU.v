@@ -428,6 +428,7 @@ or BranchorPc(PC_SIGNAL, PC_write, branchwrite);
         .reset(reset),
         // Instruções
         .input_op(instr31_26),
+        .input_funct(instr15_00[5:0])
         // Flags
         .div_zero(div_zero),
         .overflow(alu_overflow),
