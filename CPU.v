@@ -56,6 +56,10 @@ module CPU(
     wire SSControl1;    // primeiro sinal do Store Size
     wire SSControl2;    // segundo sinal do Store Size
     wire div_zero;      // indica divisão por 0
+    wire div_control;   // indica início da divisão
+    wire div_stop;      // indica fim da divisão
+    wire mult_control;  // indica início da multiplicação
+    wire mult_stop;     // indica fim da multiplicação
     wire PC_Write_Cond;
     
 
@@ -399,20 +403,24 @@ or BranchorPc(PC_SIGNAL, PC_write, branchwrite);
     div DIV(
         clk,
         reset,
+        div_control,
         output_a,
         output_b,
         DIV_hi_out,
         DIV_lo_out,
-        div_zero
+        div_zero,
+        div_stop
     );
 
     mult MULT(
         clk,
         reset,
+        mult_control,
         output_a,
         output_b,
         MULT_hi_out,
         MULT_lo_out,
+        mult_stop
     );
 
     shift_left_16 Shift_left_16(

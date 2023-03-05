@@ -1,10 +1,12 @@
 module div(
     input wire clk, // entrada de clock
     input wire reset, // sinal de reset
+    input wire div_control, // sinal para iniciar a divisão
     input signed [31:0] A, // input A
     input signed [31:0] B, // input B
     output reg signed [31:0] hi,  // resto
     output reg signed [31:0] lo, // quociente
+    output reg div_stop, // indica fim da divisão
     output reg div_zero // indica divisão por 0
 );
 
@@ -26,17 +28,16 @@ always @(posedge clk or posedge reset)
                 resto = 32'b0;
                 quociente_negativo = 0;
                 resto_negativo = 0;
-                contador = 31;
                 div_zero = 0;
-                A = 32'b0;
-                B = 32'b0;
+                div_stop = 0;
                 hi = 32'b0;
                 lo = 32'b0;
             end
 
         
-        if (contador == 31)
+        if (div_control == 1)
             begin
+                contador = 31;
                 quociente_negativo = 0;
                 resto_negativo = 0;
                 dividendo = A;
@@ -45,6 +46,7 @@ always @(posedge clk or posedge reset)
                 resto = 32'b0;
                 hi = 32'b0;
                 lo = 32'b0;
+                div_stop = 0;
             
         
                 if (divisor == 32'b0)
@@ -98,6 +100,7 @@ always @(posedge clk or posedge reset)
                     begin
                         hi = ~(hi) + 1'b1;
                     end
+                div_stop = 1;
                 contador = -1;
             end
 
