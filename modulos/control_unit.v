@@ -9,10 +9,14 @@ control_unit(
     input wire [5:0]  input_funct,
     // Flags
     input wire        div_zero,
+    input wire        div_stop,
+    input wire        mult_stop,
     input wire        overflow,
 
     // Outputs
     // Operações
+    output wire div_control,          // Indicar início da divisão
+    output wire mult_control,         // Indicar início da multiplicação
     output wire [2:0]  sel_aluop,     // Selecionar função da ALU
     output wire [2:0]  sel_shift_reg, //sinal para selecionar a operação no shift_reg
     
