@@ -49,27 +49,28 @@ control_unit(
     output wire        ss_control_2,    // Seletor do Store Size
 );
 
-//States
+
+// Opcode Parameters
 
 // R Istructions
 parameter R_OPCODE = 6'h0;
-parameter ADD      = 6'h20;
-parameter AND      = 6'h24;
-parameter DIV      = 6'h1a;
-parameter MULT     = 6'h18;
-parameter JR       = 6'h8;
-parameter MFHI     = 6'h10;
-parameter MFLO     = 6'h12;
-parameter SLL      = 6'h0;
-parameter SLLV     = 6'h4;
-parameter SLT      = 6'h2a;
-parameter SRA      = 6'h3;
-parameter SRAV     = 6'h7;
-parameter SRL      = 6'h2;
-parameter SUB      = 6'h22;
-parameter BREAK    = 6'hd;
-parameter RTE      = 6'h13
-parameter XCHG     = 6'h5;
+parameter FUN_ADD      = 6'h20;
+parameter FUN_AND      = 6'h24;
+parameter FUN_DIV      = 6'h1a;
+parameter FUN_MULT     = 6'h18;
+parameter FUN_JR       = 6'h8;
+parameter FUN_MFHI     = 6'h10;
+parameter FUN_MFLO     = 6'h12;
+parameter FUN_SLL      = 6'h0;
+parameter FUN_SLLV     = 6'h4;
+parameter FUN_SLT      = 6'h2a;
+parameter FUN_SRA      = 6'h3;
+parameter FUN_SRAV     = 6'h7;
+parameter FUN_SRL      = 6'h2;
+parameter FUN_SUB      = 6'h22;
+parameter FUN_BREAK    = 6'hd;
+parameter FUN_RTE      = 6'h13
+parameter FUN_XCHG     = 6'h5;
 
 // I Instructions 
 parameter ADDI     = 6'h8;
@@ -91,3 +92,5 @@ parameter SW       = 6'h2b;
 // J Istructions
 parameter J        = 6'h2;
 parameter JAL      = 6'h3;
+
+//States
