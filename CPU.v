@@ -27,6 +27,8 @@
 `include "modulos/sing_extend_1_32.v"
 `include "modulos/div.v"
 `include "modulos/mult.v"
+`include "modulos/control_unit.v"
+`include "modulos/shift_left_16.v"
 
 module CPU(
     input wire clk,
@@ -43,23 +45,32 @@ module CPU(
     wire sel_alusrca;   // sinal do mux alusrca
     wire sel_ir;        // selecionador do Registrador de Instruções
     wire sel_shift_src; // selecionador do mux de shift src
-    wire sel_branchop;  // sinal do mux branchOp
     wire sel_mux_hi;    // sinal do mux hi select
     wire sel_mux_lo;    // sinal do mux lo select
     wire output_branchop; // saida do mux branchop
     wire regwrite;      // sinal do banco de registradores
+    wire MDR_load;      // sinal do MDR
+    wire LSControl1;    // primeiro sinal do Load Size
+    wire LSControl2;    // segundo sinal do Load Size
+    wire SSControl1;    // primeiro sinal do Store Size
+    wire SSControl2;    // segundo sinal do Store Size
     wire div_zero;      // indica divisão por 0
+    wire PC_Write_Cond;
     
 
 // Control wires 2 bits
     wire [1:0] sel_alusrcb;    // sinal do mux alusrcb
     wire [1:0] sel_shift_amt;  // sinal para selecionar o valor a deslocar
+    wire [1:0] sel_regread;    // sinal do mux regread
+    wire [1:0] sel_branchop;  // sinal do mux branchOp
 
 
 // Control wire 3 bits
     wire [2:0]  sel_shift_reg;      //sinal para selecionar a operação no shift_reg
     wire [2:0]  sel_pc_source;      //sinal para selecionar o mux do pc source
-    wire [2:0]  sel_mux_iord;  // sinal do mux IorD
+    wire [2:0]  sel_mux_iord;       // sinal do mux IorD
+    wire [2:0]  sel_aluop;          // seletor ula
+    wire [2:0]  sel_regDst;    // selcionar no mux RegDst
 
 
 // Control wire 4 bits
@@ -72,6 +83,7 @@ module CPU(
     wire [4:0]  instr20_16;
     wire [15:0] instr15_00;
     wire [25:0] instr25_00;
+    wire [4:0]  instr15_11;
 
 
 // Data wires 5 bits
@@ -79,7 +91,6 @@ module CPU(
     wire [4:0]  regread_out;            // saida do mux regread
     wire [4:0]  regdst_out;             // saida do mux regdst
     wire [4:0]  memtoreg_out;           // saida do mux memtoreg
-
 
 
 // Data wires 32 bits
@@ -108,6 +119,7 @@ module CPU(
     wire [31:0] output_shift_src;       // saida do shift_src
     wire [31:0] output_shift;           // saida do ShiftReg
     wire [31:0] lt_extended;            // resultado do LT extendido
+    wire [31:0] MDR_out;                // saída do MDR
     wire [31:0] DIV_hi_out;             // saída HI da div
     wire [31:0] DIV_lo_out;             // saída LO da div
     wire [31:0] MULT_hi_out;            // saída HI da mult
@@ -121,13 +133,20 @@ module CPU(
     wire alu_eq;
     wire alu_gt;
     wire alu_zero;
+    wire alu_overflow;
+    wire alu_negative;
 
+// sinal do pc
+wire PC_SIGNAL;
+wire branchwrite;
+and BranchOut(branchwrite, output_branchop, PC_Write_Cond);
+or BranchorPc(PC_SIGNAL, PC_write, branchwrite);
 
 // registradores
     Registrador PC(
         clk,
         reset,
-        PC_write,
+        PC_SIGNAL,
         PC_Source_out,
         PC_Out
     );
@@ -179,7 +198,15 @@ module CPU(
         ALU_out,
         EPC_out
     );
-
+    
+    Registrador MDR(
+        clk,
+        reset,
+        MDR_load,
+        MEM_out,
+        MDR_out
+    );
+        
 
 // multiplexadores
     mux_alusrca MUX_alusra(
@@ -200,7 +227,7 @@ module CPU(
     mux_shift_amt MUX_shift_amt(
         instr15_00,
         output_b,
-        // mem -> tem que adicionar a porta
+        MEM_out,
         sel_shift_amt,
         out_shift_amt
     );
@@ -266,8 +293,34 @@ module CPU(
         memtoreg_out
     );
 
+    mux_RegDst MUX_RegDst(
+        sel_regDst,
+        instr25_21,
+        instr20_16,
+        instr15_11,
+        regdst_out
+    );
+
+    RegRead MUX_RegRead(
+        instr25_21,
+        sel_regread,
+        regread_out
+    );
 
 // outros componentes
+    ula32 ULA(
+        alusrca_out;
+        alusrcb_out;
+        sel_aluop;
+        ALU_out;
+        alu_overflow;
+        alu_negative;
+        alu_zero;
+        alu_eq;
+        alu_gt;
+        alu_lt
+    );
+    
     Memoria MEM(
         IorD_out,
         clk,
@@ -327,6 +380,21 @@ module CPU(
         instr25_00,
         shift_left_2_pc_out
     );
+    
+    loadSize Load_Size(
+        LSControl1,
+        LSControl2,
+        MDR_out,
+        load_size_out
+    );
+    
+    storeSize Store_Size(
+        SSControl1,
+        SSControl2,
+        output_b,
+        MDR_out,
+        StoreSize_out
+    );
 
     div DIV(
         clk,
@@ -345,6 +413,59 @@ module CPU(
         output_b,
         MULT_hi_out,
         MULT_lo_out,
+    );
+
+    shift_left_16 Shift_left_16(
+        instr15_00;
+        shift_left_16_out
+    );
+
+
+// unidade de controle
+    control_unit Control_Unit(
+        // Inputs
+        .clk(clk),
+        .reset(reset),
+        // Instruções
+        .input_op(instr31_26),
+        .input_funct(instr15_00[5:0])
+        // Flags
+        .div_zero(div_zero),
+        .overflow(alu_overflow),
+
+        // Outputs
+        // Operações
+        .sel_aluop(sel_aluop),
+        .sel_shift_reg(sel_shift_reg),
+        // Registradores
+        .sel_alusrcb(sel_alusrcb),
+        .sel_alusrca(sel_alusrca),
+        .AB_load(AB_load),
+        .wr(wr),        
+        .sel_regDst(sel_regDst), 
+        .sel_regread(sel_regread),
+        .regwrite(regwrite),   
+        .sel_ir(sel_ir),     
+        .EPC_load(EPC_load),   
+        .aluout_load(aluout_load),
+        .HiLo_load(HiLo_load),
+        // PC Write
+        .PC_Write_Cond(PC_Write_Cond)
+        .PC_write(PC_write),
+        // Muxes
+        .sel_mux_mem_to_reg(sel_mux_mem_to_reg,),
+        .sel_mux_iord(sel_mux_iord)
+        .sel_pc_source(sel_pc_source),     
+        .sel_shift_amt(sel_shift_amt),     
+        .sel_shift_src(sel_shift_src),     
+        .sel_branchop(sel_branchop),      
+        .sel_mux_hi(sel_mux_hi),        
+        .sel_mux_lo(sel_mux_lo),        
+        // Size Operatios /////////////////// Caio coloca aqui as tuas coisas////////////////////
+        .ls_control_1(LSControl1),
+        .ls_control_2(LSControl2),
+        .ss_control_1(SSControl1),
+        .ss_control_2(SSControl2)
     );
     
 endmodule
