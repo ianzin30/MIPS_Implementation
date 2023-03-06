@@ -431,9 +431,11 @@ or BranchorPc(PC_SIGNAL, PC_write, branchwrite);
 
 // unidade de controle
     control_unit Control_Unit(
-        // Inputs
+    // Inputs
+        // clk e reset
         .clk(clk),
         .reset(reset),
+        .reset_out(1'b0), // Adicionar na cpu
 
         // Instruções
         .input_op(instr31_26),
@@ -441,20 +443,20 @@ or BranchorPc(PC_SIGNAL, PC_write, branchwrite);
 
         // Flags
         .div_zero(div_zero),
+        .div_stop(div_stop),
+        .mult_stop(mult_stop),
         .overflow(alu_overflow),
 
-        // Outputs
+    // Outputs
         // Operações
+        .div_control(div_control),
+        .mult_control(mult_control),
         .sel_aluop(sel_aluop),
         .sel_shift_reg(sel_shift_reg),
 
         // Registradores
-        .sel_alusrcb(sel_alusrcb),
-        .sel_alusrca(sel_alusrca),
         .AB_load(AB_load),
         .wr(wr),        
-        .sel_regDst(sel_regDst), 
-        .sel_regread(sel_regread),
         .regwrite(regwrite),   
         .sel_ir(sel_ir),     
         .EPC_load(EPC_load),   
@@ -470,11 +472,15 @@ or BranchorPc(PC_SIGNAL, PC_write, branchwrite);
         .sel_mux_mem_to_reg(sel_mux_mem_to_reg,),
         .sel_mux_iord(sel_mux_iord)
         .sel_pc_source(sel_pc_source),     
+        .sel_regDst(sel_regDst), 
         .sel_shift_amt(sel_shift_amt),     
+        .sel_alusrcb(sel_alusrcb),
+        .sel_regread(sel_regread),
         .sel_shift_src(sel_shift_src),     
         .sel_branchop(sel_branchop),      
         .sel_mux_hi(sel_mux_hi),        
         .sel_mux_lo(sel_mux_lo),        
+        .sel_alusrca(sel_alusrca),
         
         // Size Operatios
         .ls_control_1(LSControl1),
