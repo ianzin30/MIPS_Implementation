@@ -90,12 +90,13 @@ module CPU(
     wire [25:0] instr25_00;
     wire [4:0]  instr15_11;
 
+// Data wires 1 bit
+    wire reset_out;
 
 // Data wires 5 bits
     wire [4:0]  out_shift_amt;
     wire [4:0]  regread_out;            // saida do mux regread
     wire [4:0]  regdst_out;             // saida do mux regdst
-    wire [4:0]  memtoreg_out;           // saida do mux memtoreg
 
 
 // Data wires 32 bits
@@ -131,6 +132,7 @@ module CPU(
     wire [31:0] MULT_lo_out;             // saída LO da mult
     wire [31:0] load_size_out;          // saída do load size
     wire [31:0] shift_left_16_out;      // saída do shift left 16
+    wire [31:0]  memtoreg_out;           // saida do mux memtoreg
 
 
 // Flags
@@ -268,7 +270,7 @@ or BranchorPc(PC_SIGNAL, PC_write, branchwrite);
         alu_zero,
         load_size_out,
         sel_pc_source,
-        PC_Source_out,
+        PC_Source_out
     );
 
     mux_hi_select MUX_hi_select(
@@ -368,7 +370,7 @@ or BranchorPc(PC_SIGNAL, PC_write, branchwrite);
 
     sing_extend_1_32 Zero_extend_1_32(
         alu_lt,
-        lt_extended,
+        lt_extended
     );
 
     sing_extend_16_32 Sign_extend_16_32(
@@ -436,7 +438,7 @@ or BranchorPc(PC_SIGNAL, PC_write, branchwrite);
         // clk e reset
         .clk(clk),
         .reset(reset),
-        .reset_out(1'b0), // Adicionar na cpu
+        .reset_out(reset_out), // Adicionar na cpu
 
         // Instruções
         .input_op(instr31_26),
@@ -466,7 +468,7 @@ or BranchorPc(PC_SIGNAL, PC_write, branchwrite);
         .MDR_load(MDR_load),
         
         // PC Write
-        .PC_Write_Cond(PC_Write_Cond),
+        .PC_WriteCond(PC_Write_Cond),
         .PC_write(PC_write),
 
         // Muxes
