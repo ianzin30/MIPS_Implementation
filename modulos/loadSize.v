@@ -2,7 +2,7 @@ module loadSize(
     input wire LSControl1,
     input wire LSControl2,
     input wire [31:0] LSin_mdr,
-    output wire [31:0] LSout
+    output reg [31:0] LSout
 );
 
     wire [31:0] Aux;

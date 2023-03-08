@@ -3,7 +3,7 @@ module storeSize(
     input  wire SSControl2,
     input  wire [31:0] SSin_regB, 
     input  wire [31:0] SSin_mdr, 
-    output wire [31:0] SSout
+    output reg [31:0] SSout
 );
 
     wire [31:0] Aux;
