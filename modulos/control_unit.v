@@ -1,11 +1,11 @@
-control_unit(
+module control_unit(
 // Inputs
-// clk e reset
+    // clk e reset
     input wire clk,
-    input wire reset,
-    input wire reset_out,
+    input reg reset,
+    output reg reset_out,
 
-// Instruções
+    // Instruções
     input wire [5:0]  input_op,
     input wire [5:0]  input_funct,
     
@@ -15,47 +15,47 @@ control_unit(
     input wire        mult_stop,
     input wire        overflow,
 
-    // Outputs
+// Outputs
     // Operações
-    output wire div_control,          // Indicar início da divisão
-    output wire mult_control,         // Indicar início da multiplicação
-    output wire [2:0]  sel_aluop,     // Selecionar função da ALU
-    output wire [2:0]  sel_shift_reg, // selecionar op no shift reg
+    output reg div_control,          // Indicar início da divisão
+    output reg mult_control,         // Indicar início da multiplicação
+    output reg [2:0]  sel_aluop,     // Selecionar função da ALU
+    output reg [2:0]  sel_shift_reg, // selecionar op no shift reg
     
-// Registradores
-    output wire AB_load,
-    output wire wr,            // MemRead or MemWrite
-    output wire regwrite,      // escrever/ler no banco de reg
-    output wire sel_ir,        // Selecionador do instruction reg
-    output wire EPC_load,      // sinal para carregar no EPC
-    output wire aluout_load,   
-    output wire HiLo_load,
-    output wire MDR_load,
+    // Registradores
+    output reg AB_load,
+    output reg wr,            // MemRead or MemWrite
+    output reg regwrite,      // escrever/ler no banco de reg
+    output reg sel_ir,        // Selecionador do instruction reg
+    output reg EPC_load,      // sinal para carregar no EPC
+    output reg aluout_load,   
+    output reg HiLo_load,
+    output reg MDR_load,
 
-// oi jotavesse
-// PC Write
-    output wire PC_WriteCond,  // branch signal
-    output wire PC_write,      // PC_Write
+    // oi jotavesse
+    // PC Write
+    output reg PC_WriteCond,  // branch signal
+    output reg PC_write,      // PC_Write
 
-// Muxes
-    output wire [3:0] sel_mux_mem_to_reg,
-    output wire [2:0] sel_mux_iord,
-    output wire [2:0] sel_pc_source,       // Selecionar mux do pc_source
-    output wire [2:0] sel_regDst,          // Selecionar registrador destino
-    output wire [1:0] sel_shift_amt,       //Selecionar mux amt
-    output wire [1:0] sel_alusrcb,   // Selecionar entrada do registrador B
-    output wire sel_regread,          // sinal do mux regread
-    output wire sel_shift_src,       // sinal do shift src
-    output wire sel_branchop,        // Selecionar a operação a Branch
-    output wire sel_mux_hi,          // sinal do mux hi select
-    output wire sel_mux_lo,          // sinal do mux lo select
-    output wire sel_alusrca,   // Selecionar entrada do registrador A
+    // Muxes
+    output reg [3:0] sel_mux_mem_to_reg,
+    output reg [2:0] sel_mux_iord,
+    output reg [2:0] sel_pc_source,       // Selecionar mux do pc_source
+    output reg [2:0] sel_regDst,          // Selecionar registrador destino
+    output reg [1:0] sel_shift_amt,       //Selecionar mux amt
+    output reg [1:0] sel_alusrcb,   // Selecionar entrada do registrador B
+    output reg sel_regread,          // sinal do mux regread
+    output reg sel_shift_src,       // sinal do shift src
+    output reg [1:0] sel_branchop,        // Selecionar a operação a Branch
+    output reg sel_mux_hi,          // sinal do mux hi select
+    output reg sel_mux_lo,          // sinal do mux lo select
+    output reg sel_alusrca,   // Selecionar entrada do registrador A
 
-// Size Operations
-    output wire ls_control_1,    // Controlador do Load Size1
-    output wire ls_control_2,    // Controlador do Load Size2
-    output wire ss_control_1,    // Seletor do Store Size
-    output wire ss_control_2    // Seletor do Store Size
+    // Size Operations
+    output reg ls_control_1,    // Controlador do Load Size1
+    output reg ls_control_2,    // Controlador do Load Size2
+    output reg ss_control_1,    // Seletor do Store Size
+    output reg ss_control_2    // Seletor do Store Size
 );
 
 
@@ -78,7 +78,7 @@ parameter FUN_SRAV     = 6'h7;
 parameter FUN_SRL      = 6'h2;
 parameter FUN_SUB      = 6'h22;
 parameter FUN_BREAK    = 6'hd;
-parameter FUN_RTE      = 6'h13
+parameter FUN_RTE      = 6'h13;
 parameter FUN_XCHG     = 6'h5;
 
 // I Instructions 
@@ -163,7 +163,7 @@ parameter ST_overflow = 6'd42;    // overflow
 
 parameter ST_ShiftV = 6'd43; // Funçoes de Shift com Variável (SLLV/SRAV)
 parameter ST_ShiftI = 6'd44; // Funçoes de Shift com Imediato (SLL, SRA, SRL)
-parameter ST_SLLV = 6'd45; // 
+parameter ST_SLLV = 6'd45; 
 parameter ST_SRAV = 6'd46;
 parameter ST_SLL = 6'd47;
 parameter ST_SRA = 6'd48;
@@ -188,12 +188,14 @@ parameter ST_LB = 6'd61;
 parameter ST_SW = 6'd62;
 parameter ST_SH = 6'd63;
 parameter ST_SB = 6'd64;
+parameter ST_decode3 = 6'd65;
 
 reg [5:0] STATE;
+reg [5:0] SHIFT_MODE;
 reg [6:0] COUNTER;
 
 initial begin
-    reset_out = 1'b1
+    reset_out = 1'b1;
 end
 
 always @(posedge clk) begin
@@ -232,8 +234,8 @@ always @(posedge clk) begin
         case(STATE)
             ST_fetch1:begin
                 STATE = ST_fetch2;
-                wr = 0;
                 sel_mux_iord = 3'b0;
+                wr = 0;
             end
             ST_fetch2:begin
                 STATE = ST_decode1;
@@ -247,8 +249,13 @@ always @(posedge clk) begin
                 STATE = ST_decode2;
                 sel_ir = 1;
                 sel_regread = 0;
+                regwrite = 0;
             end
             ST_decode2:begin
+                STATE = ST_decode3;
+                AB_load = 1;
+            end
+            ST_decode3:begin
                 sel_alusrca = 0;
                 sel_alusrcb = 2'b11;
                 sel_aluop = 3'b001;
@@ -279,22 +286,28 @@ always @(posedge clk) begin
                                 STATE = ST_mflo;
                             end
                             FUN_SLL:begin
-                                STATE = ST_SLL;
+                                STATE = ST_ShiftI;
+                                SHIFT_MODE = ST_SLL;
                             end
                             FUN_SLLV:begin
-                                STATE = ST_SLLV;
+                                STATE = ST_ShiftV;
+                                SHIFT_MODE = ST_SLLV;
                             end
                             FUN_SLT:begin
-                                STATE = ST_SLT;
+                                STATE = ST_ShiftI;
+                                SHIFT_MODE = ST_SLT;
                             end
                             FUN_SRA:begin
-                                STATE = ST_SRA;
+                                STATE = ST_ShiftI;
+                                SHIFT_MODE = ST_SRA;
                             end
                             FUN_SRAV:begin
-                                STATE = ST_SRAV;
+                                STATE = ST_ShiftV;
+                                SHIFT_MODE = ST_SRAV;
                             end
                             FUN_SRL:begin
-                                STATE = ST_SRL;
+                                STATE = ST_ShiftI;
+                                SHIFT_MODE = ST_SRL;
                             end
                             FUN_SUB:begin
                                 STATE = ST_sub;
@@ -364,13 +377,28 @@ always @(posedge clk) begin
                 endcase
             end
             ST_and:begin
-                /* escrever cod aq*/
+                STATE = ST_save011;
+                sel_alusrca = 2'd1;
+                sel_alusrcb = 2'd0;
+                sel_aluop = 3'b011;
+                aluout_load = 1;
             end
             ST_add:begin
-                /* escrever cod aq*/
+                STATE = ST_save011;
+                sel_alusrca = 2'd1;
+                sel_alusrcb = 2'd0;
+                sel_aluop = 3'b001;
+                aluout_load = 1;
+            end
+            ST_sub:begin
+                STATE = ST_save011;
+                sel_alusrca = 2'd1;
+                sel_alusrcb = 2'd0;
+                sel_aluop = 3'b001;
+                aluout_load = 1;
             end
             ST_reset:begin
-                reset = 1'b1;
+                reset_out = 1'b1;
             end
             ST_j:begin
                 STATE = ST_fetch1;
@@ -400,9 +428,86 @@ always @(posedge clk) begin
                 STATE = ST_fetch1;
                 PC_write = 1;
             end
+            ST_SLT:begin
+                STATE = ST_fetch1;
+                sel_alusrca = 1'b1;
+                sel_alusrcb = 2'b00;
+                sel_aluop = 3'b111;
+                sel_mux_mem_to_reg = 4'b1000;
+                sel_regDst = 3'b011;
+            end
+            ST_SLTI:begin
+                STATE = ST_fetch1;
+                sel_alusrca = 1'b1;
+                sel_alusrcb = 2'b10;
+                sel_aluop = 3'b111;
+                sel_mux_mem_to_reg = 4'b1000;
+                sel_regDst = 3'b011;
+            end
+            ST_BREAK:begin
+                STATE = ST_fetch1;
+                sel_alusrca = 1'b1;
+                sel_alusrcb = 2'b01;
+                sel_aluop = 3'b010;
+                sel_pc_source = 3'b000;
+                PC_write = 1'b1;
+            end
+            ST_RTE:begin
+                sel_pc_source = 3'b100;
+                PC_write = 1'b1;
+            end
+            ST_ShiftV:begin
+                STATE = SHIFT_MODE;
+                sel_shift_src = 1'b0;
+                sel_shift_reg = 3'b001;
+            end
+            ST_ShiftI:begin
+                STATE = SHIFT_MODE;
+                sel_shift_src = 1'b1;
+                sel_shift_reg = 3'b001;
+            end
+            ST_SLLV:begin
+                STATE = ST_ShiftS;
+                sel_shift_amt = 2'b00;
+                sel_shift_reg = 3'b010;
+            end
+            ST_SRAV:begin
+                STATE = ST_ShiftS;
+                sel_shift_amt = 2'b00;
+                sel_shift_reg = 3'b100;
+            end
+            ST_SLL:begin
+                STATE = ST_ShiftS;
+                sel_shift_amt = 2'b01;
+                sel_shift_reg = 3'b010;
+            end
+            ST_SRA:begin
+                STATE = ST_ShiftS;
+                sel_shift_amt = 2'b01;
+                sel_shift_reg = 3'b100;
+            end
+            ST_SRL:begin
+                STATE = ST_ShiftS;
+                sel_shift_amt = 2'b01;
+                sel_shift_reg = 3'b011;
+            end
+            ST_ShiftS:begin
+                STATE = ST_fetch1;
+                sel_mux_mem_to_reg = 4'b0100;
+                 sel_regDst = 3'b011;
+            end
+             ST_save011:begin
+                STATE = ST_fetch1;
+                aluout_load = 0;
+                sel_regDst = 3'b011;
+                sel_mux_mem_to_reg = 4'd0;
+                regwrite = 1;
+            end
             default:begin
                 STATE = ST_IOP;
+                
             end
         endcase
     end
 end
+endmodule
