@@ -495,16 +495,73 @@ always @(posedge clk) begin
                 sel_mux_mem_to_reg <= 4'b0100;
                  sel_regDst <= 3'b011;
             end
-             ST_save011:begin
+            ST_save011:begin
                 STATE <= ST_fetch1;
                 aluout_load <= 0;
                 sel_regDst <= 3'b011;
                 sel_mux_mem_to_reg <= 4'd0;
                 regwrite <= 1;
             end
+            ST_jal1:begin
+                STATE <= ST_jal2;
+                sel_alusrca <= 0;
+                sel_aluop <= 3'b0;
+                aluout_load <= 1;
+            end
+            ST_jal2:begin
+                STATE <= ST_j;
+                sel_mux_mem_to_reg <= 4'b0;
+                sel_regDst <= 3'b010;
+                regwrite <= 1;
+            end
+            ST_jr1:begin
+                STATE <= ST_jr2;
+                sel_alusrca <= 1;
+                sel_aluop <= 3'b0;
+            end
+            ST_jr2:begin
+                STATE <= ST_fetch1;
+                sel_pc_source <= 3'b0;
+                PC_write <= 1;
+            end
+            ST_beq:begin
+                STATE <= ST_fetch1;
+                PC_WriteCond <= 1;
+                sel_alusrca <= 1;
+                sel_alusrcb <= 2'b0;
+                sel_aluop <= 3'b111;
+                sel_branchop <= 2'b0;
+                sel_pc_source <= 3'b001;
+            end
+            ST_bne:begin
+                STATE <= ST_fetch1;
+                PC_WriteCond <= 1;
+                sel_alusrca <= 1;
+                sel_alusrcb <= 2'b0;
+                sel_aluop <= 3'b111;
+                sel_branchop <= 2'b01;
+                sel_pc_source <= 3'b001;
+            end
+            ST_bgt:begin
+                STATE <= ST_fetch1;
+                PC_WriteCond <= 1;
+                sel_alusrca <= 1;
+                sel_alusrcb <= 2'b0;
+                sel_aluop <= 3'b111;
+                sel_branchop <= 2'b10;
+                sel_pc_source <= 3'b001;
+            end
+            ST_ble:begin
+                STATE <= ST_fetch1;
+                PC_WriteCond <= 1;
+                sel_alusrca <= 1;
+                sel_alusrcb <= 2'b0;
+                sel_aluop <= 3'b111;
+                sel_branchop <= 2'b11;
+                sel_pc_source <= 3'b001;
+            end 
             default:begin
                 STATE <= ST_IOP;
-                
             end
         endcase
     end
