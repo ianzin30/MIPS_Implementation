@@ -129,7 +129,7 @@ parameter ST_jr2 = 6'd18;
 parameter ST_div1 = 6'd19;
 parameter ST_div2 = 6'd43;
 parameter ST_div3 = 6'd20;
-parameter ST_DP0 = 6'd21;   // divisao por zero
+parameter ST_DP0_1 = 6'd21;   // divisao por zero
 
 parameter ST_mult1 = 6'd22;
 parameter ST_mult2 = 6'd44;
@@ -188,6 +188,11 @@ parameter ST_SW = 6'd62;
 parameter ST_SH = 6'd63;
 parameter ST_SB = 6'd64;
 parameter ST_decode3 = 6'd65;
+
+parameter ST_DP0_2 = 6'd66; 
+parameter ST_DP0_3 = 6'd67; 
+parameter ST_DP0_4 = 6'd68; 
+parameter ST_DP0_5 = 6'd69; 
 
 reg [5:0] STATE;
 reg [5:0] SHIFT_MODE;
@@ -560,6 +565,126 @@ always @(posedge clk) begin
                 sel_branchop <= 2'b11;
                 sel_pc_source <= 3'b001;
             end 
+            ST_div1:begin
+                STATE <= ST_div2;
+                div_control <= 1;
+            end
+            ST_div2:begin
+                div_control <= 0;
+                if(div_zero) begin
+                    STATE <= ST_DP0_1;
+                end
+                else begin
+                    if(div_stop) begin
+                        STATE <= ST_div3;
+                    end
+                end
+            end
+            ST_div3:begin
+                STATE <= ST_fetch1;
+                Hiselect <= 0;
+                Loselect <= 0;
+                HiLo_load <= 1;
+            end
+            ST_DP0_1:begin
+                STATE <= ST_DP0_2;
+                sel_alusrca <= 1'b0;
+                sel_alusrcb <= 2'b01;
+                sel_aluop <= 3'b010;
+            end
+            ST_DP0_2:begin
+                STATE <= ST_DP0_3;
+                sel_mux_iord <= 3'b100;
+                wr <= 0;
+            end
+            ST_DP0_3:begin // waiting // 
+                STATE <= ST_DP0_4;
+            end
+            ST_DP0_4:begin
+                STATE <= ST_DP0_5;
+                ls_control_1 <= 1;
+                ls_control_2 <= 1;
+                pc_source <= 3'b110;
+            end
+            ST_DP0_5:begin
+                STATE <= ST_fetch1;
+                PC_write <= 1;
+            end
+            ST_mult1:begin
+                STATE <= ST_mult2;
+                mult_control <= 1;
+            end
+            ST_mult2:begin
+                mult_control <= 0;
+                if(mult_stop)begin
+                    STATE <= ST_div3;
+                end
+            end
+            ST_mult3:begin
+                STATE <= ST_fetch1;
+                Hiselect <= 1;
+                Loselect <= 1;
+                HiLo_load <= 1;
+            end
+            ST_mfhi:begin
+                STATE <= ST_fetch1;
+                sel_mux_mem_to_reg = <= 4'b0010;
+                sel_regDst <= 3'b011;
+                regwrite <= 1;
+            end
+            ST_mflo:begin
+                STATE <= ST_fetch1;
+                sel_mux_mem_to_reg = <= 4'b0011;
+                sel_regDst <= 3'b011;
+                regwrite <= 1;
+            end
+            ST_xch1:begin
+                STATE <= ST_xch2;
+                sel_alusrca <= 1;
+                sel_aluop <= 3'b000;
+                sel_mux_mem_to_reg <= 4'b0000;
+                aluout_load <= 1;
+            end
+            ST_xch2:begin
+                STATE <= ST_xch3;
+                sel_regDst <= 3'b000;
+                regwrite <= 1;
+            end
+            ST_xch3:begin
+                STATE <= ST_xch4;
+                sel_mux_mem_to_reg <= 4'b0111;
+            end
+            ST_xch4:begin
+                STATE <= ST_fetch1;
+                sel_regDst <= 3'b100;
+                regwrite <= 1;
+            end
+            ST_sram1:begin
+                STATE <= ST_sram2;
+                sel_alusrca <= 1;
+                sel_alusrcb <= 2'b10;
+                sel_aluop <= 3'b001;
+            end
+            ST_sram2:begin
+                STATE <= ST_sram3;
+                sel_mux_iord <= 3'b001;
+                wr <= 0;
+            end
+            ST_sram3:begin
+                STATE <= ST_sram4;
+                sel_shift_src <= 1;
+            end
+            ST_sram4:begin
+                STATE <= ST_sram5;
+                sel_shift_amt <= 2'b10;
+                sel_shift_reg <= 3'b100;
+            end
+            ST_sram5:begin
+                STATE <= ST_fetch1;
+                sel_mux_mem_to_reg <= 4'b0100;
+                sel_regDst <= 3'b000;
+                regwrite <= 1;
+            end   
             default:begin
                 STATE <= ST_IOP;
             end
