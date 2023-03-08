@@ -198,7 +198,7 @@ initial begin
 end
 
 always @(posedge clk) begin
-    if (reset == 1'b1 or STATE == ST_reset) begin
+    if (reset == 1'b1 || STATE == ST_reset) begin
         STATE = ST_fetch1;
         AB_load = 0;
         wr = 0;
@@ -395,9 +395,6 @@ always @(posedge clk) begin
                 sel_aluop = 3'b001;
                 aluout_load = 1;
             end
-            ST_reset:begin
-                reset_out = 1'b1;
-            end
             ST_j:begin
                 STATE = ST_fetch1;
                 sel_pc_source = 3'b010;
@@ -411,7 +408,7 @@ always @(posedge clk) begin
                 EPC_load = 1;
             end
             ST_trat1:begin
-                STATE:ST_trat2;
+                STATE = ST_trat2;
                 sel_mux_iord = 3'b010;
                 wr = 0;
             end

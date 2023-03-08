@@ -81,7 +81,6 @@ module CPU(
 // Control wire 4 bits
     wire [3:0] sel_mux_mem_to_reg; // sinal do mux mem to reg
 
-
 // Instruction wires
     wire [5:0]  instr31_26;
     wire [4:0]  instr25_21;
@@ -96,9 +95,7 @@ module CPU(
     wire [4:0]  regdst_out;             // saida do mux regdst
 
 // Data wire 28 bits
-
     wire[27:0] shift_left_2_pc_out;
-
 
 // Data wires 32 bits
     wire [31:0] PC_Source_out;          // fio que sai do mux pc_source
