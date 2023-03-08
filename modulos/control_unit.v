@@ -46,7 +46,7 @@ module control_unit(
     output reg [1:0] sel_alusrcb,   // Selecionar entrada do registrador B
     output reg sel_regread,          // sinal do mux regread
     output reg sel_shift_src,       // sinal do shift src
-    output reg sel_branchop,        // Selecionar a operação a Branch
+    output reg [1:0] sel_branchop,        // Selecionar a operação a Branch
     output reg sel_mux_hi,          // sinal do mux hi select
     output reg sel_mux_lo,          // sinal do mux lo select
     output reg sel_alusrca,   // Selecionar entrada do registrador A

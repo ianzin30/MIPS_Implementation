@@ -98,6 +98,10 @@ module CPU(
     wire [4:0]  regread_out;            // saida do mux regread
     wire [4:0]  regdst_out;             // saida do mux regdst
 
+// Data wire 28 bits
+
+    wire[27:0] shift_left_2_pc_out;
+
 
 // Data wires 32 bits
     wire [31:0] PC_Source_out;          // fio que sai do mux pc_source
@@ -273,22 +277,21 @@ or BranchorPc(PC_SIGNAL, PC_write, branchwrite);
         PC_Source_out
     );
 
-    mux_hi_select MUX_hi_select(
-        sel_mux_hi,
+    mux_hi_select MUX_HI_select(
         DIV_hi_out,
         MULT_hi_out,
+        sel_mux_hi,
         HiSelect_out
     );
 
     mux_lo_select MUX_LO_select(
-        sel_mux_lo,
         DIV_lo_out,
         MULT_lo_out,
+        sel_mux_lo,
         LoSelect_out
     );
 
     mux_mem_to_reg MUX_MEM_TO_REG(
-        sel_mux_mem_to_reg,
         ALU_out,
         load_size_out,
         Hi_Out,
@@ -297,6 +300,7 @@ or BranchorPc(PC_SIGNAL, PC_write, branchwrite);
         shift_left_16_out,
         output_b,
         sign_extend_1_32_out,
+        sel_mux_mem_to_reg,
         memtoreg_out
     );
 
