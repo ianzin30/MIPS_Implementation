@@ -46,7 +46,7 @@ module control_unit(
     output reg [1:0] sel_alusrcb,   // Selecionar entrada do registrador B
     output reg sel_regread,          // sinal do mux regread
     output reg sel_shift_src,       // sinal do shift src
-    output reg sel_branchop,        // Selecionar a operação a Branch
+    output reg [1:0] sel_branchop,        // Selecionar a operação a Branch
     output reg sel_mux_hi,          // sinal do mux hi select
     output reg sel_mux_lo,          // sinal do mux lo select
     output reg sel_alusrca,   // Selecionar entrada do registrador A
@@ -378,23 +378,23 @@ always @(posedge clk) begin
             end
             ST_and:begin
                 STATE = ST_save011;
-                ALUSRCA_select = 2'd1;
-                ALUSRCB_select = 2'd0;
-                ALU_control = 3'b011;
+                sel_alusrca = 2'd1;
+                sel_alusrcb = 2'd0;
+                sel_aluop = 3'b011;
                 aluout_load = 1;
             end
             ST_add:begin
                 STATE = ST_save011;
-                ALUSRCA_select = 2'd1;
-                ALUSRCB_select = 2'd0;
-                ALU_control = 3'b001;
+                sel_alusrca = 2'd1;
+                sel_alusrcb = 2'd0;
+                sel_aluop = 3'b001;
                 aluout_load = 1;
             end
             ST_sub:begin
                 STATE = ST_save011;
-                ALUSRCA_select = 2'd1;
-                ALUSRCB_select = 2'd0;
-                ALU_control = 3'b001;
+                sel_alusrca = 2'd1;
+                sel_alusrcb = 2'd0;
+                sel_aluop = 3'b001;
                 aluout_load = 1;
             end
             ST_reset:begin
