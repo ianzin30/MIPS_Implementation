@@ -377,10 +377,25 @@ always @(posedge clk) begin
                 endcase
             end
             ST_and:begin
-                /* escrever cod aq*/
+                STATE = ST_save011;
+                ALUSRCA_select = 2'd1;
+                ALUSRCB_select = 2'd0;
+                ALU_control = 3'b011;
+                aluout_load = 1;
             end
             ST_add:begin
-                /* escrever cod aq*/
+                STATE = ST_save011;
+                ALUSRCA_select = 2'd1;
+                ALUSRCB_select = 2'd0;
+                ALU_control = 3'b001;
+                aluout_load = 1;
+            end
+            ST_sub:begin
+                STATE = ST_save011;
+                ALUSRCA_select = 2'd1;
+                ALUSRCB_select = 2'd0;
+                ALU_control = 3'b001;
+                aluout_load = 1;
             end
             ST_reset:begin
                 reset = 1'b1;
@@ -480,6 +495,13 @@ always @(posedge clk) begin
                 STATE = ST_fetch1;
                 sel_mux_mem_to_reg = 4'b0100;
                  sel_regDst = 3'b011;
+            end
+             ST_save011:begin
+                STATE = ST_fetch1;
+                aluout_load = 0;
+                sel_regDst = 3'b011;
+                sel_mux_mem_to_reg = 4'd0;
+                regwrite = 1;
             end
             default:begin
                 STATE = ST_IOP;
