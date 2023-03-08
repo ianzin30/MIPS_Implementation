@@ -1,9 +1,9 @@
-control_unit(
+module control_unit(
 // Inputs
     // clk e reset
     input wire clk,
-    input wire reset,
-    input wire reset_out,
+    input reg reset,
+    output reg reset_out,
 
     // Instruções
     input wire [5:0]  input_op,
@@ -78,7 +78,7 @@ parameter FUN_SRAV     = 6'h7;
 parameter FUN_SRL      = 6'h2;
 parameter FUN_SUB      = 6'h22;
 parameter FUN_BREAK    = 6'hd;
-parameter FUN_RTE      = 6'h13
+parameter FUN_RTE      = 6'h13;
 parameter FUN_XCHG     = 6'h5;
 
 // I Instructions 
@@ -195,7 +195,7 @@ reg [5:0] SHIFT_MODE;
 reg [6:0] COUNTER;
 
 initial begin
-    reset_out = 1'b1
+    reset_out = 1'b1;
 end
 
 always @(posedge clk) begin
@@ -398,7 +398,7 @@ always @(posedge clk) begin
                 aluout_load = 1;
             end
             ST_reset:begin
-                reset = 1'b1;
+                reset_out = 1'b1;
             end
             ST_j:begin
                 STATE = ST_fetch1;
@@ -510,3 +510,4 @@ always @(posedge clk) begin
         endcase
     end
 end
+endmodule
