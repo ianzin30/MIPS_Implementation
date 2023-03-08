@@ -1,35 +1,36 @@
-// Imports dos módulos da Especificação
 
-`include "arquivos_espec/Banco_reg.vhd"
-`include "arquivos_espec/Instr_Reg.vhd"
-`include "arquivos_espec/Memoria.vhd"
-`include "arquivos_espec/RegDesloc.vhd"
-`include "arquivos_espec/Registrador.vhd"
-`include "arquivos_espec/ula32.vhd"
+/*// Imports dos módulos da Especificação
+
+`include "Banco_reg.vhd"
+`include "Instr_Reg.vhd"
+`include "Memoria.vhd"
+`include "RegDesloc.vhd"
+`include "Registrador.vhd"
+`include "ula32.vhd"
 
 
 // Inports dos Módulos Criados
-`include "modulos/mux_alusrca.v"
-`include "modulos/mux_alusrcb.v"
-`include "modulos/mux_BranchOp.v"
-`include "modulos/mux_IorD.v"
-`include "modulos/mux_pc_source.v"
-`include "modulos/mux_RegDst.v"
-`include "modulos/mux_shift_amt.v"
-`include "modulos/mux_shift_src.v"
-`include "modulos/mux_hi_select.v"
-`include "modulos/mux_lo_select.v"
-`include "modulos/mux_mem_to_reg.v"
-`include "modulos/RegRead.v"
-`include "modulos/shift_left_2.v"
-`include "modulos/shift_left_2_PC.v"
-`include "modulos/sing_extend_16_32.v"
-`include "modulos/sing_extend_1_32.v"
-`include "modulos/div.v"
-`include "modulos/mult.v"
-`include "modulos/control_unit.v"
-`include "modulos/shift_left_16.v"
-
+`include "mux_alusrca.v"
+`include "mux_alusrcb.v"
+`include "mux_BranchOp.v"
+`include "mux_IorD.v"
+`include "mux_pc_source.v"
+`include "mux_RegDst.v"
+`include "mux_shift_amt.v"
+`include "mux_shift_src.v"
+`include "mux_hi_select.v"
+`include "mux_lo_select.v"
+`include "mux_mem_to_reg.v"
+`include "RegRead.v"
+`include "shift_left_2.v"
+`include "shift_left_2_PC.v"
+`include "sing_extend_16_32.v"
+`include "sing_extend_1_32.v"
+`include "div.v"
+`include "mult.v"
+`include "control_unit.v"
+`include "shift_left_16.v"
+*/
 module CPU(
     input wire clk,
     input wire reset
@@ -105,7 +106,7 @@ module CPU(
     wire [31:0] output_a;               // saida de A
     wire [31:0] input_b;                // valor que vai para B (do banco_reg)
     wire [31:0] output_b;               // saida de B
-    wire [31:0] MEM_out                 // saida da memoria
+    wire [31:0] MEM_out;                 // saida da memoria
     wire [31:0] StoreSize_out;          // saida do store size
     wire [31:0] ALU_out;                // saida da ALU
     wire [31:0] ALUOut_Out;             // saida da ALUOut
@@ -117,7 +118,7 @@ module CPU(
     wire [31:0] EPC_out;                // saida do epc
     wire [31:0] alusrca_out;            // saida do AluSrcA
     wire [31:0] sign_extend_16_32_out;  // saida do sign extend 16-32
-    wire [31:0] sign_extend_1_32_out    // saída do sign extend 1-32
+    wire [31:0] sign_extend_1_32_out;    // saída do sign extend 1-32
     wire [31:0] shift_left_2_out;       // saida do shift left 2
     wire [31:0] alusrcb_out;            // saida do alusrcb
     wire [31:0] output_shift_src;       // saida do shift_src
@@ -313,15 +314,15 @@ or BranchorPc(PC_SIGNAL, PC_write, branchwrite);
 
 // outros componentes
     ula32 ULA(
-        alusrca_out;
-        alusrcb_out;
-        sel_aluop;
-        ALU_out;
-        alu_overflow;
-        alu_negative;
-        alu_zero;
-        alu_eq;
-        alu_gt;
+        alusrca_out,
+        alusrcb_out,
+        sel_aluop,
+        ALU_out,
+        alu_overflow,
+        alu_negative,
+        alu_zero,
+        alu_eq,
+        alu_gt,
         alu_lt
     );
     
@@ -424,7 +425,7 @@ or BranchorPc(PC_SIGNAL, PC_write, branchwrite);
     );
 
     shift_left_16 Shift_left_16(
-        instr15_00;
+        instr15_00,
         shift_left_16_out
     );
 
@@ -465,12 +466,12 @@ or BranchorPc(PC_SIGNAL, PC_write, branchwrite);
         .MDR_load(MDR_load),
         
         // PC Write
-        .PC_Write_Cond(PC_Write_Cond)
+        .PC_Write_Cond(PC_Write_Cond),
         .PC_write(PC_write),
 
         // Muxes
-        .sel_mux_mem_to_reg(sel_mux_mem_to_reg,),
-        .sel_mux_iord(sel_mux_iord)
+        .sel_mux_mem_to_reg(sel_mux_mem_to_reg),
+        .sel_mux_iord(sel_mux_iord),
         .sel_pc_source(sel_pc_source),     
         .sel_regDst(sel_regDst), 
         .sel_shift_amt(sel_shift_amt),     
