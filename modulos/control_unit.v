@@ -3,17 +3,16 @@ module control_unit(
     // clk e reset
     input wire clk,
     input reg reset,
-    output reg reset_out,
 
     // Instruções
     input wire [5:0]  input_op,
     input wire [5:0]  input_funct,
     
     // Flags
-    input wire        div_zero,
-    input wire        div_stop,
-    input wire        mult_stop,
-    input wire        overflow,
+    input wire div_zero,
+    input wire div_stop,
+    input wire mult_stop,
+    input wire overflow,
 
 // Outputs
     // Operações
@@ -46,7 +45,7 @@ module control_unit(
     output reg [1:0] sel_alusrcb,   // Selecionar entrada do registrador B
     output reg sel_regread,          // sinal do mux regread
     output reg sel_shift_src,       // sinal do shift src
-    output reg sel_branchop,        // Selecionar a operação a Branch
+    output reg [1:0] sel_branchop,        // Selecionar a operação a Branch
     output reg sel_mux_hi,          // sinal do mux hi select
     output reg sel_mux_lo,          // sinal do mux lo select
     output reg sel_alusrca,   // Selecionar entrada do registrador A
@@ -112,7 +111,7 @@ parameter ST_decode2 = 6'd4;
 
 parameter ST_IOP = 6'd5;    // opcode invalido
 parameter ST_trat1 = 6'd6;  // primeira etapa do tratamento de excecao
-parameter ST_waiting = 6'd7;
+parameter ST_trat2 = 6'd7;
 parameter ST_trat3 = 6'd8;
 parameter ST_trat4 = 6'd9;  // ultima etapa
 
@@ -195,11 +194,11 @@ reg [5:0] SHIFT_MODE;
 reg [6:0] COUNTER;
 
 initial begin
-    reset_out = 1'b1;
+    STATE = ST_reset;
 end
 
 always @(posedge clk) begin
-    if (reset == 1'b1) begin
+    if (reset == 1'b1 or STATE == ST_reset) begin
         STATE = ST_fetch1;
         AB_load = 0;
         wr = 0;
@@ -229,7 +228,6 @@ always @(posedge clk) begin
         sel_regDst = 3'b001;
         sel_mux_mem_to_reg = 4'b0101;
         regwrite = 1;
-        reset_out = 1'b0;
     end else begin
         case(STATE)
             ST_fetch1:begin
@@ -378,23 +376,23 @@ always @(posedge clk) begin
             end
             ST_and:begin
                 STATE = ST_save011;
-                ALUSRCA_select = 2'd1;
-                ALUSRCB_select = 2'd0;
-                ALU_control = 3'b011;
+                sel_alusrca = 2'd1;
+                sel_alusrcb = 2'd0;
+                sel_aluop = 3'b011;
                 aluout_load = 1;
             end
             ST_add:begin
                 STATE = ST_save011;
-                ALUSRCA_select = 2'd1;
-                ALUSRCB_select = 2'd0;
-                ALU_control = 3'b001;
+                sel_alusrca = 2'd1;
+                sel_alusrcb = 2'd0;
+                sel_aluop = 3'b001;
                 aluout_load = 1;
             end
             ST_sub:begin
                 STATE = ST_save011;
-                ALUSRCA_select = 2'd1;
-                ALUSRCB_select = 2'd0;
-                ALU_control = 3'b001;
+                sel_alusrca = 2'd1;
+                sel_alusrcb = 2'd0;
+                sel_aluop = 3'b001;
                 aluout_load = 1;
             end
             ST_reset:begin
@@ -413,9 +411,13 @@ always @(posedge clk) begin
                 EPC_load = 1;
             end
             ST_trat1:begin
-                //STATE:ST_trat3
+                STATE:ST_trat2;
                 sel_mux_iord = 3'b010;
                 wr = 0;
+            end
+            ST_trat2:begin
+                // estado apenas de waiting
+                STATE=ST_trat3;
             end
             ST_trat3:begin
                 STATE = ST_trat4;
