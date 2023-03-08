@@ -194,316 +194,316 @@ reg [5:0] SHIFT_MODE;
 reg [6:0] COUNTER;
 
 initial begin
-    STATE = ST_reset;
+    STATE <= ST_reset;
 end
 
 always @(posedge clk) begin
     if (reset == 1'b1 || STATE == ST_reset) begin
-        STATE = ST_fetch1;
-        AB_load = 0;
-        wr = 0;
-        sel_ir = 0;
-        EPC_load = 0;
-        aluout_load = 0;
-        HiLo_load = 0;
-        PC_WriteCond = 0;
-        PC_write = 0;
-        sel_shift_src = 0;
-        sel_branchop = 0;
-        sel_mux_hi = 0;
-        sel_mux_lo = 0;
-        sel_alusrca = 0;
-        ls_control_1 = 0;
-        ls_control_2 = 0;
-        ss_control_1 = 0;
-        ss_control_2 = 0;
-        sel_regread = 0;
-        sel_alusrcb = 2'b0;
-        sel_shift_amt = 2'b0;
-        sel_aluop = 2'b0;
-        sel_shift_reg = 2'b0;
-        sel_pc_source = 3'b0;
-        sel_mux_iord = 3'b0;
+        STATE <= ST_fetch1;
+        AB_load <= 0;
+        wr <= 0;
+        sel_ir <= 0;
+        EPC_load <= 0;
+        aluout_load <= 0;
+        HiLo_load <= 0;
+        PC_WriteCond <= 0;
+        PC_write <= 0;
+        sel_shift_src <= 0;
+        sel_branchop <= 0;
+        sel_mux_hi <= 0;
+        sel_mux_lo <= 0;
+        sel_alusrca <= 0;
+        ls_control_1 <= 0;
+        ls_control_2 <= 0;
+        ss_control_1 <= 0;
+        ss_control_2 <= 0;
+        sel_regread <= 0;
+        sel_alusrcb <= 2'b0;
+        sel_shift_amt <= 2'b0;
+        sel_aluop <= 2'b0;
+        sel_shift_reg <= 2'b0;
+        sel_pc_source <= 3'b0;
+        sel_mux_iord <= 3'b0;
         // resetando o topo da pilha
-        sel_regDst = 3'b001;
-        sel_mux_mem_to_reg = 4'b0101;
-        regwrite = 1;
+        sel_regDst <= 3'b001;
+        sel_mux_mem_to_reg <= 4'b0101;
+        regwrite <= 1;
     end else begin
         case(STATE)
             ST_fetch1:begin
-                STATE = ST_fetch2;
-                sel_mux_iord = 3'b0;
-                wr = 0;
+                STATE <= ST_fetch2;
+                sel_mux_iord <= 3'b0;
+                wr <= 0;
             end
             ST_fetch2:begin
-                STATE = ST_decode1;
-                sel_alusrca = 0;
-                sel_alusrcb = 2'b01;
-                sel_aluop = 3'b001;
-                sel_pc_source = 3'b0;
-                PC_write = 1;
+                STATE <= ST_decode1;
+                sel_alusrca <= 0;
+                sel_alusrcb <= 2'b01;
+                sel_aluop <= 3'b001;
+                sel_pc_source <= 3'b0;
+                PC_write <= 1;
             end
             ST_decode1:begin
-                STATE = ST_decode2;
-                sel_ir = 1;
-                sel_regread = 0;
-                regwrite = 0;
+                STATE <= ST_decode2;
+                sel_ir <= 1;
+                sel_regread <= 0;
+                regwrite <= 0;
             end
             ST_decode2:begin
-                STATE = ST_decode3;
-                AB_load = 1;
+                STATE <= ST_decode3;
+                AB_load <= 1;
             end
             ST_decode3:begin
-                sel_alusrca = 0;
-                sel_alusrcb = 2'b11;
-                sel_aluop = 3'b001;
-                aluout_load = 1;
+                sel_alusrca <= 0;
+                sel_alusrcb <= 2'b11;
+                sel_aluop <= 3'b001;
+                aluout_load <= 1;
 
                 case(input_op)
                     R_OPCODE:begin
                         case(input_funct)
                             FUN_ADD:begin
-                                STATE = ST_add;
+                                STATE <= ST_add;
                             end
                             FUN_AND:begin
-                                STATE = ST_and;
+                                STATE <= ST_and;
                             end
                             FUN_DIV:begin
-                                STATE = ST_div1;
+                                STATE <= ST_div1;
                             end
                             FUN_MULT:begin
-                                STATE = ST_mult1;
+                                STATE <= ST_mult1;
                             end
                             FUN_JR:begin
-                                STATE = ST_jr1;
+                                STATE <= ST_jr1;
                             end
                             FUN_MFHI:begin
-                                STATE = ST_mfhi;
+                                STATE <= ST_mfhi;
                             end
                             FUN_MFLO:begin
-                                STATE = ST_mflo;
+                                STATE <= ST_mflo;
                             end
                             FUN_SLL:begin
-                                STATE = ST_ShiftI;
-                                SHIFT_MODE = ST_SLL;
+                                STATE <= ST_ShiftI;
+                                SHIFT_MODE <= ST_SLL;
                             end
                             FUN_SLLV:begin
-                                STATE = ST_ShiftV;
-                                SHIFT_MODE = ST_SLLV;
+                                STATE <= ST_ShiftV;
+                                SHIFT_MODE <= ST_SLLV;
                             end
                             FUN_SLT:begin
-                                STATE = ST_ShiftI;
-                                SHIFT_MODE = ST_SLT;
+                                STATE <= ST_ShiftI;
+                                SHIFT_MODE <= ST_SLT;
                             end
                             FUN_SRA:begin
-                                STATE = ST_ShiftI;
-                                SHIFT_MODE = ST_SRA;
+                                STATE <= ST_ShiftI;
+                                SHIFT_MODE <= ST_SRA;
                             end
                             FUN_SRAV:begin
-                                STATE = ST_ShiftV;
-                                SHIFT_MODE = ST_SRAV;
+                                STATE <= ST_ShiftV;
+                                SHIFT_MODE <= ST_SRAV;
                             end
                             FUN_SRL:begin
-                                STATE = ST_ShiftI;
-                                SHIFT_MODE = ST_SRL;
+                                STATE <= ST_ShiftI;
+                                SHIFT_MODE <= ST_SRL;
                             end
                             FUN_SUB:begin
-                                STATE = ST_sub;
+                                STATE <= ST_sub;
                             end
                             FUN_BREAK:begin
-                                STATE = ST_BREAK;
+                                STATE <= ST_BREAK;
                             end
                             FUN_RTE:begin
-                                STATE = ST_RTE;
+                                STATE <= ST_RTE;
                             end 
                             FUN_XCHG:begin
-                                STATE = ST_xch1;
+                                STATE <= ST_xch1;
                             end
                         endcase
                     end
                     ADDI:begin
-                        STATE = ST_addi;
+                        STATE <= ST_addi;
                     end
                     ADDIU:begin
-                        STATE = ST_addiu;
+                        STATE <= ST_addiu;
                     end
                     BEQ:begin
-                        STATE = ST_beq;
+                        STATE <= ST_beq;
                     end
                     BNE:begin
-                        STATE = ST_bne;
+                        STATE <= ST_bne;
                     end
                     BLE:begin
-                        STATE = ST_ble;
+                        STATE <= ST_ble;
                     end
                     BGT:begin
-                        STATE = ST_bgt;
+                        STATE <= ST_bgt;
                     end
                     SRAM:begin
-                        STATE = ST_sram1;
+                        STATE <= ST_sram1;
                     end
                     LB:begin
-                        STATE = ST_LB;
+                        STATE <= ST_LB;
                     end
                     LH:begin
-                        STATE = ST_LH;
+                        STATE <= ST_LH;
                     end
                     LUI:begin
-                        STATE = ST_LUI;
+                        STATE <= ST_LUI;
                     end
                     LW:begin
-                        STATE = ST_LW;
+                        STATE <= ST_LW;
                     end
                     SB:begin
-                        STATE = ST_SB;
+                        STATE <= ST_SB;
                     end
                     SH:begin
-                        STATE = ST_SH;
+                        STATE <= ST_SH;
                     end
                     SLTI:begin
-                        STATE = ST_SLTI;
+                        STATE <= ST_SLTI;
                     end
                     SW:begin
-                        STATE = ST_SW;
+                        STATE <= ST_SW;
                     end
                     J:begin
-                        STATE = ST_j;
+                        STATE <= ST_j;
                     end
                     JAL:begin
-                        STATE = ST_jal1;
+                        STATE <= ST_jal1;
                     end
                 endcase
             end
             ST_and:begin
-                STATE = ST_save011;
-                sel_alusrca = 2'd1;
-                sel_alusrcb = 2'd0;
-                sel_aluop = 3'b011;
-                aluout_load = 1;
+                STATE <= ST_save011;
+                sel_alusrca <= 2'd1;
+                sel_alusrcb <= 2'd0;
+                sel_aluop <= 3'b011;
+                aluout_load <= 1;
             end
             ST_add:begin
-                STATE = ST_save011;
-                sel_alusrca = 2'd1;
-                sel_alusrcb = 2'd0;
-                sel_aluop = 3'b001;
-                aluout_load = 1;
+                STATE <= ST_save011;
+                sel_alusrca <= 2'd1;
+                sel_alusrcb <= 2'd0;
+                sel_aluop <= 3'b001;
+                aluout_load <= 1;
             end
             ST_sub:begin
-                STATE = ST_save011;
-                sel_alusrca = 2'd1;
-                sel_alusrcb = 2'd0;
-                sel_aluop = 3'b001;
-                aluout_load = 1;
+                STATE <= ST_save011;
+                sel_alusrca <= 2'd1;
+                sel_alusrcb <= 2'd0;
+                sel_aluop <= 3'b001;
+                aluout_load <= 1;
             end
             ST_j:begin
-                STATE = ST_fetch1;
-                sel_pc_source = 3'b010;
-                PC_write = 1;
+                STATE <= ST_fetch1;
+                sel_pc_source <= 3'b010;
+                PC_write <= 1;
             end
             ST_IOP:begin
-                STATE = ST_trat1;
-                sel_alusrca = 0;
-                sel_alusrcb = 2'b01;
-                sel_aluop = 3'b010;
-                EPC_load = 1;
+                STATE <= ST_trat1;
+                sel_alusrca <= 0;
+                sel_alusrcb <= 2'b01;
+                sel_aluop <= 3'b010;
+                EPC_load <= 1;
             end
             ST_trat1:begin
-                STATE = ST_trat2;
-                sel_mux_iord = 3'b010;
-                wr = 0;
+                STATE <= ST_trat2;
+                sel_mux_iord <= 3'b010;
+                wr <= 0;
             end
             ST_trat2:begin
                 // estado apenas de waiting
                 STATE=ST_trat3;
             end
             ST_trat3:begin
-                STATE = ST_trat4;
-                MDR_load = 1;
-                ls_control_1 = 1;
-                ls_control_2 = 1;
-                sel_pc_source = 3'b110;
+                STATE <= ST_trat4;
+                MDR_load <= 1;
+                ls_control_1 <= 1;
+                ls_control_2 <= 1;
+                sel_pc_source <= 3'b110;
             end
             ST_trat4:begin
-                STATE = ST_fetch1;
-                PC_write = 1;
+                STATE <= ST_fetch1;
+                PC_write <= 1;
             end
             ST_SLT:begin
-                STATE = ST_fetch1;
-                sel_alusrca = 1'b1;
-                sel_alusrcb = 2'b00;
-                sel_aluop = 3'b111;
-                sel_mux_mem_to_reg = 4'b1000;
-                sel_regDst = 3'b011;
+                STATE <= ST_fetch1;
+                sel_alusrca <= 1'b1;
+                sel_alusrcb <= 2'b00;
+                sel_aluop <= 3'b111;
+                sel_mux_mem_to_reg <= 4'b1000;
+                sel_regDst <= 3'b011;
             end
             ST_SLTI:begin
-                STATE = ST_fetch1;
-                sel_alusrca = 1'b1;
-                sel_alusrcb = 2'b10;
-                sel_aluop = 3'b111;
-                sel_mux_mem_to_reg = 4'b1000;
-                sel_regDst = 3'b011;
+                STATE <= ST_fetch1;
+                sel_alusrca <= 1'b1;
+                sel_alusrcb <= 2'b10;
+                sel_aluop <= 3'b111;
+                sel_mux_mem_to_reg <= 4'b1000;
+                sel_regDst <= 3'b011;
             end
             ST_BREAK:begin
-                STATE = ST_fetch1;
-                sel_alusrca = 1'b1;
-                sel_alusrcb = 2'b01;
-                sel_aluop = 3'b010;
-                sel_pc_source = 3'b000;
-                PC_write = 1'b1;
+                STATE <= ST_fetch1;
+                sel_alusrca <= 1'b1;
+                sel_alusrcb <= 2'b01;
+                sel_aluop <= 3'b010;
+                sel_pc_source <= 3'b000;
+                PC_write <= 1'b1;
             end
             ST_RTE:begin
-                sel_pc_source = 3'b100;
-                PC_write = 1'b1;
+                sel_pc_source <= 3'b100;
+                PC_write <= 1'b1;
             end
             ST_ShiftV:begin
-                STATE = SHIFT_MODE;
-                sel_shift_src = 1'b0;
-                sel_shift_reg = 3'b001;
+                STATE <= SHIFT_MODE;
+                sel_shift_src <= 1'b0;
+                sel_shift_reg <= 3'b001;
             end
             ST_ShiftI:begin
-                STATE = SHIFT_MODE;
-                sel_shift_src = 1'b1;
-                sel_shift_reg = 3'b001;
+                STATE <= SHIFT_MODE;
+                sel_shift_src <= 1'b1;
+                sel_shift_reg <= 3'b001;
             end
             ST_SLLV:begin
-                STATE = ST_ShiftS;
-                sel_shift_amt = 2'b00;
-                sel_shift_reg = 3'b010;
+                STATE <= ST_ShiftS;
+                sel_shift_amt <= 2'b00;
+                sel_shift_reg <= 3'b010;
             end
             ST_SRAV:begin
-                STATE = ST_ShiftS;
-                sel_shift_amt = 2'b00;
-                sel_shift_reg = 3'b100;
+                STATE <= ST_ShiftS;
+                sel_shift_amt <= 2'b00;
+                sel_shift_reg <= 3'b100;
             end
             ST_SLL:begin
-                STATE = ST_ShiftS;
-                sel_shift_amt = 2'b01;
-                sel_shift_reg = 3'b010;
+                STATE <= ST_ShiftS;
+                sel_shift_amt <= 2'b01;
+                sel_shift_reg <= 3'b010;
             end
             ST_SRA:begin
-                STATE = ST_ShiftS;
-                sel_shift_amt = 2'b01;
-                sel_shift_reg = 3'b100;
+                STATE <= ST_ShiftS;
+                sel_shift_amt <= 2'b01;
+                sel_shift_reg <= 3'b100;
             end
             ST_SRL:begin
-                STATE = ST_ShiftS;
-                sel_shift_amt = 2'b01;
-                sel_shift_reg = 3'b011;
+                STATE <= ST_ShiftS;
+                sel_shift_amt <= 2'b01;
+                sel_shift_reg <= 3'b011;
             end
             ST_ShiftS:begin
-                STATE = ST_fetch1;
-                sel_mux_mem_to_reg = 4'b0100;
-                 sel_regDst = 3'b011;
+                STATE <= ST_fetch1;
+                sel_mux_mem_to_reg <= 4'b0100;
+                 sel_regDst <= 3'b011;
             end
              ST_save011:begin
-                STATE = ST_fetch1;
-                aluout_load = 0;
-                sel_regDst = 3'b011;
-                sel_mux_mem_to_reg = 4'd0;
-                regwrite = 1;
+                STATE <= ST_fetch1;
+                aluout_load <= 0;
+                sel_regDst <= 3'b011;
+                sel_mux_mem_to_reg <= 4'd0;
+                regwrite <= 1;
             end
             default:begin
-                STATE = ST_IOP;
+                STATE <= ST_IOP;
                 
             end
         endcase
