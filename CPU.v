@@ -90,9 +90,6 @@ module CPU(
     wire [25:0] instr25_00;
     wire [4:0]  instr15_11;
 
-// Data wires 1 bit
-    wire reset_out;
-
 // Data wires 5 bits
     wire [4:0]  out_shift_amt;
     wire [4:0]  regread_out;            // saida do mux regread
@@ -442,7 +439,6 @@ or BranchorPc(PC_SIGNAL, PC_write, branchwrite);
         // clk e reset
         .clk(clk),
         .reset(reset),
-        .reset_out(reset_out), // Adicionar na cpu
 
         // Instruções
         .input_op(instr31_26),
