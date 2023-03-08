@@ -81,7 +81,6 @@ module CPU(
 // Control wire 4 bits
     wire [3:0] sel_mux_mem_to_reg; // sinal do mux mem to reg
 
-
 // Instruction wires
     wire [5:0]  instr31_26;
     wire [4:0]  instr25_21;
@@ -90,18 +89,13 @@ module CPU(
     wire [25:0] instr25_00;
     wire [4:0]  instr15_11;
 
-// Data wires 1 bit
-    wire reset_out;
-
 // Data wires 5 bits
     wire [4:0]  out_shift_amt;
     wire [4:0]  regread_out;            // saida do mux regread
     wire [4:0]  regdst_out;             // saida do mux regdst
 
 // Data wire 28 bits
-
     wire[27:0] shift_left_2_pc_out;
-
 
 // Data wires 32 bits
     wire [31:0] PC_Source_out;          // fio que sai do mux pc_source
@@ -442,7 +436,6 @@ or BranchorPc(PC_SIGNAL, PC_write, branchwrite);
         // clk e reset
         .clk(clk),
         .reset(reset),
-        .reset_out(reset_out), // Adicionar na cpu
 
         // Instruções
         .input_op(instr31_26),
