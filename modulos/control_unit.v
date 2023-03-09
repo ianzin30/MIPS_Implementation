@@ -232,6 +232,7 @@ always @(posedge clk) begin
         sel_shift_reg <= 2'b0;
         sel_pc_source <= 3'b0;
         sel_mux_iord <= 3'b0;
+        MDR_load <= 0;
         // resetando o topo da pilha
         sel_regDst <= 3'b001;
         sel_mux_mem_to_reg <= 4'b0101;
