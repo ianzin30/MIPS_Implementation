@@ -604,8 +604,8 @@ always @(posedge clk) begin
             end
             ST_div3:begin
                 STATE <= ST_fetch1;
-                Hiselect <= 0;
-                Loselect <= 0;
+                sel_mux_hi <= 0;
+                sel_mux_lo <= 0;
                 HiLo_load <= 1;
             end
             ST_DP0_1:begin
@@ -632,19 +632,19 @@ always @(posedge clk) begin
             end
             ST_mult3:begin
                 STATE <= ST_fetch1;
-                Hiselect <= 1;
-                Loselect <= 1;
+                sel_mux_hi <= 1;
+                sel_mux_lo <= 1;
                 HiLo_load <= 1;
             end
             ST_mfhi:begin
                 STATE <= ST_fetch1;
-                sel_mux_mem_to_reg = <= 4'b0010;
+                sel_mux_mem_to_reg <= 4'b0010;
                 sel_regDst <= 3'b011;
                 regwrite <= 1;
             end
             ST_mflo:begin
                 STATE <= ST_fetch1;
-                sel_mux_mem_to_reg = <= 4'b0011;
+                sel_mux_mem_to_reg <= 4'b0011;
                 sel_regDst <= 3'b011;
                 regwrite <= 1;
             end
@@ -713,7 +713,7 @@ always @(posedge clk) begin
                 wr <= 0;
             end
             ST_waiting1:begin
-                STATE <= mdrwrite;
+                STATE <= ST_mdrwrite;
             end
             ST_mdrwrite:begin
                 MDR_load <= 1;
@@ -763,28 +763,28 @@ always @(posedge clk) begin
                 regwrite <= 1;
             end
             ST_SW:begin
-                STATE <= waiting2;
+                STATE <= ST_waiting2;
                 ss_control_1 <= 0;
                 ss_control_2 <= 0;
                 sel_mux_iord <= 3'b001;
                 wr <= 1;
             end
             ST_SH:begin
-                STATE <= waiting2;
+                STATE <= ST_waiting2;
                 ss_control_1 <= 1;
                 ss_control_2 <= 0;
                 sel_mux_iord <= 3'b001;
                 wr <= 1;
             end
             ST_SB:begin
-                STATE <= waiting2;
+                STATE <= ST_waiting2;
                 ss_control_1 <= 1;
                 ss_control_2 <= 1;
                 sel_mux_iord <= 3'b001;
                 wr <= 1;
             end
             ST_waiting2:begin
-                STATE <= fetch1;
+                STATE <= ST_fetch1;
             end
             default:begin
                 STATE <= ST_IOP;
