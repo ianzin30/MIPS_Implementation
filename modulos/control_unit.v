@@ -397,6 +397,20 @@ always @(posedge clk) begin
                 STATE <= ST_save011;
                 sel_alusrca <= 2'd1;
                 sel_alusrcb <= 2'd0;
+                sel_aluop <= 3'b010;
+                aluout_load <= 1;
+            end
+            ST_addi:begin
+                STATE <= ST_save000;
+                sel_alusrca <= 2'd1;
+                sel_alusrcb <= 2'd2;
+                sel_aluop <= 3'b001;
+                aluout_load <= 1;
+            end
+            ST_addiu:begin
+                STATE <= ST_save000;
+                sel_alusrca <= 2'd1;
+                sel_alusrcb <= 2'd2;
                 sel_aluop <= 3'b001;
                 aluout_load <= 1;
             end
@@ -504,6 +518,13 @@ always @(posedge clk) begin
                 STATE <= ST_fetch1;
                 aluout_load <= 0;
                 sel_regDst <= 3'b011;
+                sel_mux_mem_to_reg <= 4'd0;
+                regwrite <= 1;
+            end
+            ST_save000:begin
+                STATE <= ST_fetch1;
+                aluout_load <= 0;
+                sel_regDst <= 3'b000;
                 sel_mux_mem_to_reg <= 4'd0;
                 regwrite <= 1;
             end
