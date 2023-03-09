@@ -193,7 +193,7 @@ parameter ST_DP0_2 = 6'd66;
 parameter ST_DP0_3 = 6'd67; 
 parameter ST_DP0_4 = 6'd68; 
 parameter ST_DP0_5 = 6'd69; 
-    
+   
 parameter ST_waiting1 = 6'd70;
 parameter ST_waiting2 = 6'd71;
 
@@ -226,13 +226,13 @@ always @(posedge clk) begin
         ss_control_1 <= 0;
         ss_control_2 <= 0;
         sel_regread <= 0;
+        MDR_load <= 0;
         sel_alusrcb <= 2'b0;
         sel_shift_amt <= 2'b0;
         sel_aluop <= 2'b0;
         sel_shift_reg <= 2'b0;
         sel_pc_source <= 3'b0;
         sel_mux_iord <= 3'b0;
-        MDR_load <= 0;
         // resetando o topo da pilha
         sel_regDst <= 3'b001;
         sel_mux_mem_to_reg <= 4'b0101;
@@ -401,6 +401,20 @@ always @(posedge clk) begin
                 STATE <= ST_save011;
                 sel_alusrca <= 2'd1;
                 sel_alusrcb <= 2'd0;
+                sel_aluop <= 3'b010;
+                aluout_load <= 1;
+            end
+            ST_addi:begin
+                STATE <= ST_save000;
+                sel_alusrca <= 2'd1;
+                sel_alusrcb <= 2'd2;
+                sel_aluop <= 3'b001;
+                aluout_load <= 1;
+            end
+            ST_addiu:begin
+                STATE <= ST_save000;
+                sel_alusrca <= 2'd1;
+                sel_alusrcb <= 2'd2;
                 sel_aluop <= 3'b001;
                 aluout_load <= 1;
             end
@@ -508,6 +522,13 @@ always @(posedge clk) begin
                 STATE <= ST_fetch1;
                 aluout_load <= 0;
                 sel_regDst <= 3'b011;
+                sel_mux_mem_to_reg <= 4'd0;
+                regwrite <= 1;
+            end
+            ST_save000:begin
+                STATE <= ST_fetch1;
+                aluout_load <= 0;
+                sel_regDst <= 3'b000;
                 sel_mux_mem_to_reg <= 4'd0;
                 regwrite <= 1;
             end

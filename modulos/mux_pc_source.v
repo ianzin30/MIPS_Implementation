@@ -18,7 +18,7 @@ module mux_pc_source(
             3'b100: out = in_100;
             3'b101: out = in_101;
             3'b110: out = in_110;
-            3'b111: out = 32'b0;; 
+            3'b111: out = 32'b0; 
         endcase
     end
 endmodule
