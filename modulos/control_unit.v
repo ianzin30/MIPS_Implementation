@@ -190,9 +190,6 @@ parameter ST_SB = 6'd64;
 parameter ST_decode3 = 6'd65;
 
 parameter ST_DP0_2 = 6'd66; 
-parameter ST_DP0_3 = 6'd67; 
-parameter ST_DP0_4 = 6'd68; 
-parameter ST_DP0_5 = 6'd69; 
    
 parameter ST_waiting1 = 6'd70;
 parameter ST_waiting2 = 6'd71;
@@ -616,24 +613,12 @@ always @(posedge clk) begin
                 sel_alusrca <= 1'b0;
                 sel_alusrcb <= 2'b01;
                 sel_aluop <= 3'b010;
+                EPC_load <= 1;
             end
             ST_DP0_2:begin
-                STATE <= ST_DP0_3;
+                STATE <= ST_trat2;
                 sel_mux_iord <= 3'b100;
                 wr <= 0;
-            end
-            ST_DP0_3:begin // waiting // 
-                STATE <= ST_DP0_4;
-            end
-            ST_DP0_4:begin
-                STATE <= ST_DP0_5;
-                ls_control_1 <= 1;
-                ls_control_2 <= 1;
-                pc_source <= 3'b110;
-            end
-            ST_DP0_5:begin
-                STATE <= ST_fetch1;
-                PC_write <= 1;
             end
             ST_mult1:begin
                 STATE <= ST_mult2;
