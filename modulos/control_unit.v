@@ -193,6 +193,9 @@ parameter ST_DP0_2 = 6'd66;
 parameter ST_DP0_3 = 6'd67; 
 parameter ST_DP0_4 = 6'd68; 
 parameter ST_DP0_5 = 6'd69; 
+   
+parameter ST_waiting1 = 6'd70;
+parameter ST_waiting2 = 6'd71;
 
 reg [5:0] STATE;
 reg [5:0] SHIFT_MODE;
@@ -223,6 +226,7 @@ always @(posedge clk) begin
         ss_control_1 <= 0;
         ss_control_2 <= 0;
         sel_regread <= 0;
+        MDR_load <= 0;
         sel_alusrcb <= 2'b0;
         sel_shift_amt <= 2'b0;
         sel_aluop <= 2'b0;
@@ -348,28 +352,28 @@ always @(posedge clk) begin
                         STATE <= ST_sram1;
                     end
                     LB:begin
-                        STATE <= ST_LB;
+                        STATE <= ST_loadstr1;
                     end
                     LH:begin
-                        STATE <= ST_LH;
+                        STATE <= ST_loadstr1;
                     end
                     LUI:begin
                         STATE <= ST_LUI;
                     end
                     LW:begin
-                        STATE <= ST_LW;
+                        STATE <= ST_loadstr1;
                     end
                     SB:begin
-                        STATE <= ST_SB;
+                        STATE <= ST_loadstr1;
                     end
                     SH:begin
-                        STATE <= ST_SH;
+                        STATE <= ST_loadstr1;
                     end
                     SLTI:begin
                         STATE <= ST_SLTI;
                     end
                     SW:begin
-                        STATE <= ST_SW;
+                        STATE <= ST_loadstr1;
                     end
                     J:begin
                         STATE <= ST_j;
@@ -706,6 +710,97 @@ always @(posedge clk) begin
                 sel_regDst <= 3'b000;
                 regwrite <= 1;
             end   
+            ST_LUI:begin
+                STATE <= ST_fetch1;
+                sel_mux_mem_to_reg <= 4'b0110;
+                sel_regDst <= 3'b000;
+                regwrite <= 1;
+            end    
+            ST_loadstr1:begin
+                STATE <= ST_loadstr2;
+                sel_alusrca <= 1;
+                sel_alusrcb <= 2'b10;
+                sel_aluop <= 3'b001;
+            end
+            ST_loadstr2:begin
+                STATE <= ST_waiting1;
+                sel_mux_iord <= 3'b001;
+                wr <= 0;
+            end
+            ST_waiting1:begin
+                STATE <= mdrwrite;
+            end
+            ST_mdrwrite:begin
+                MDR_load <= 1;
+                case(input_op)
+                    LW:begin
+                        STATE <= ST_LW;
+                    end
+                    LH:begin
+                        STATE <= ST_LH;    
+                    end
+                    LB:begin
+                        STATE <= ST_LB;
+                    end
+                    SW:begin
+                        STATE <= ST_SW;
+                    end
+                    SH:begin
+                        STATE <= ST_SH;
+                    end
+                    SB:begin
+                        STATE <= ST_SB;
+                    end
+                endcase
+            end
+            ST_LW:begin
+                STATE <= ST_fetch1;
+                ls_control_1 <= 0;
+                ls_control_2 <= 0;
+                sel_mux_mem_to_reg <= 4'b0001;
+                sel_regDst <= 3'b000;
+                regwrite <= 1;
+            end
+            ST_LH:begin
+                STATE <= ST_fetch1;
+                ls_control_1 <= 1;
+                ls_control_2 <= 0;
+                sel_mux_mem_to_reg <= 4'b0001;
+                sel_regDst <= 3'b000;
+                regwrite <= 1;
+            end
+            ST_LB:begin
+                STATE <= ST_fetch1;
+                ls_control_1 <= 1;
+                ls_control_2 <= 1;
+                sel_mux_mem_to_reg <= 4'b0001;
+                sel_regDst <= 3'b000;
+                regwrite <= 1;
+            end
+            ST_SW:begin
+                STATE <= waiting2;
+                ss_control_1 <= 0;
+                ss_control_2 <= 0;
+                sel_mux_iord <= 3'b001;
+                wr <= 1;
+            end
+            ST_SH:begin
+                STATE <= waiting2;
+                ss_control_1 <= 1;
+                ss_control_2 <= 0;
+                sel_mux_iord <= 3'b001;
+                wr <= 1;
+            end
+            ST_SB:begin
+                STATE <= waiting2;
+                ss_control_1 <= 1;
+                ss_control_2 <= 1;
+                sel_mux_iord <= 3'b001;
+                wr <= 1;
+            end
+            ST_waiting2:begin
+                STATE <= fetch1;
+            end
             default:begin
                 STATE <= ST_IOP;
             end
