@@ -194,6 +194,8 @@ parameter ST_DP0_2 = 7'd66;
 parameter ST_waiting1 = 7'd70;
 parameter ST_waiting2 = 7'd71;
 
+parameter ST_overflow2 = 7'd72;
+
 reg [6:0] STATE;
 reg [5:0] SHIFT_MODE;
 reg [6:0] COUNTER;
@@ -516,6 +518,9 @@ always @(posedge clk) begin
                  sel_regDst <= 3'b011;
             end
             ST_save011:begin
+                if (overflow == 1 && (input_funct == FUN_ADD || input_funct == FUN_SUB)) begin
+                    STATE = ST_overflow;
+                end else begin
                 STATE <= ST_fetch1;
                 aluout_load <= 0;
                 sel_regDst <= 3'b011;
@@ -523,11 +528,26 @@ always @(posedge clk) begin
                 regwrite <= 1;
             end
             ST_save000:begin
+                if (overflow == 1 && input_funct == FUN_ADDI) begin
+                    STATE = ST_overflow;
+                end else begin
                 STATE <= ST_fetch1;
                 aluout_load <= 0;
                 sel_regDst <= 3'b000;
                 sel_mux_mem_to_reg <= 4'd0;
                 regwrite <= 1;
+            end
+            ST_overflow:begin
+                STATE <= ST_overflow2;
+                sel_alusrca <= 0;
+                sel_alusrcb <= 2'b01;
+                sel_aluop <= 3'b010;
+                EPC_load <= 1;
+            end
+            ST_overflow2:begin
+                STATE <= ST_trat2;
+                sel_mux_iord <= 3'b011;
+                wr <= 0;
             end
             ST_jal1:begin
                 STATE <= ST_jal2;
