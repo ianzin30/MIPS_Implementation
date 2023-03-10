@@ -18,6 +18,7 @@ reg quociente_negativo; // caso os números tenham sinais diferentes
 reg resto_negativo; // caso o dividendo seja negativo
 integer contador = 31; // contador para iterar pelos bits do número
 
+
 always @(posedge clk or posedge reset) 
     begin
         if(reset == 1)
@@ -52,6 +53,7 @@ always @(posedge clk or posedge reset)
                 if (divisor == 32'b0)
                     begin
                         div_zero = 1;
+                        div_stop = 1;
                         contador = -1;
                     end
                 else
@@ -114,8 +116,10 @@ always @(posedge clk or posedge reset)
                 resto_negativo = 0;
             end
 
-        contador = contador - 1;
-            
+        if(div_stop == 0)
+            begin
+                contador = contador - 1;
+            end  
         
     end
 

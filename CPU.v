@@ -408,8 +408,8 @@ or BranchorPc(PC_SIGNAL, PC_write, branchwrite);
         output_b,
         DIV_hi_out,
         DIV_lo_out,
-        div_zero,
-        div_stop
+        div_stop,
+        div_zero
     );
 
     mult MULT(
