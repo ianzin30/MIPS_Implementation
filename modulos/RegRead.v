@@ -9,5 +9,5 @@ module RegRead(
       1'b0: out = in_00; 
       1'b1: out = 32'b11111; //31; 
     endcase
-  end,
+  end
 endmodule
