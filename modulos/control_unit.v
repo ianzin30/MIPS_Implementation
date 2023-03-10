@@ -3,6 +3,7 @@ module control_unit(
     // clk e reset
     input wire clk,
     input reg reset,
+    output reg reset_out,
 
     // Instruções
     input wire [5:0]  input_op,
@@ -194,17 +195,20 @@ parameter ST_DP0_2 = 7'd66;
 parameter ST_waiting1 = 7'd70;
 parameter ST_waiting2 = 7'd71;
 
+parameter ST_decode4 = 7'd72;
+
 reg [6:0] STATE;
 reg [5:0] SHIFT_MODE;
 reg [6:0] COUNTER;
 
 initial begin
-    STATE = ST_reset;
+    reset_out = 1'b1;
 end
 
 always @(posedge clk) begin
-    if (reset == 1'b1 || STATE == ST_reset) begin
+    if (reset == 1'b1) begin
         STATE <= ST_fetch1;
+        reset_out <= 0;
         AB_load <= 0;
         wr <= 0;
         sel_ir <= 0;
@@ -251,12 +255,14 @@ always @(posedge clk) begin
             end
             ST_decode1:begin
                 STATE <= ST_decode2;
+                PC_write <= 0;
                 sel_ir <= 1;
                 sel_regread <= 0;
                 regwrite <= 0;
             end
             ST_decode2:begin
                 STATE <= ST_decode3;
+                sel_ir <= 0;
                 AB_load <= 1;
             end
             ST_decode3:begin
@@ -264,154 +270,156 @@ always @(posedge clk) begin
                 sel_alusrcb <= 2'b11;
                 sel_aluop <= 3'b001;
                 aluout_load <= 1;
-
-                case(input_op)
-                    R_OPCODE:begin
-                        case(input_funct)
-                            FUN_ADD:begin
-                                STATE <= ST_add;
-                            end
-                            FUN_AND:begin
-                                STATE <= ST_and;
-                            end
-                            FUN_DIV:begin
-                                STATE <= ST_div1;
-                            end
-                            FUN_MULT:begin
-                                STATE <= ST_mult1;
-                            end
-                            FUN_JR:begin
-                                STATE <= ST_jr1;
-                            end
-                            FUN_MFHI:begin
-                                STATE <= ST_mfhi;
-                            end
-                            FUN_MFLO:begin
-                                STATE <= ST_mflo;
-                            end
-                            FUN_SLL:begin
-                                STATE <= ST_ShiftI;
-                                SHIFT_MODE <= ST_SLL;
-                            end
-                            FUN_SLLV:begin
-                                STATE <= ST_ShiftV;
-                                SHIFT_MODE <= ST_SLLV;
-                            end
-                            FUN_SLT:begin
-                                STATE <= ST_ShiftI;
-                                SHIFT_MODE <= ST_SLT;
-                            end
-                            FUN_SRA:begin
-                                STATE <= ST_ShiftI;
-                                SHIFT_MODE <= ST_SRA;
-                            end
-                            FUN_SRAV:begin
-                                STATE <= ST_ShiftV;
-                                SHIFT_MODE <= ST_SRAV;
-                            end
-                            FUN_SRL:begin
-                                STATE <= ST_ShiftI;
-                                SHIFT_MODE <= ST_SRL;
-                            end
-                            FUN_SUB:begin
-                                STATE <= ST_sub;
-                            end
-                            FUN_BREAK:begin
-                                STATE <= ST_BREAK;
-                            end
-                            FUN_RTE:begin
-                                STATE <= ST_RTE;
-                            end 
-                            FUN_XCHG:begin
-                                STATE <= ST_xch1;
-                            end
-                        endcase
-                    end
-                    ADDI:begin
-                        STATE <= ST_addi;
-                    end
-                    ADDIU:begin
-                        STATE <= ST_addiu;
-                    end
-                    BEQ:begin
-                        STATE <= ST_beq;
-                    end
-                    BNE:begin
-                        STATE <= ST_bne;
-                    end
-                    BLE:begin
-                        STATE <= ST_ble;
-                    end
-                    BGT:begin
-                        STATE <= ST_bgt;
-                    end
-                    SRAM:begin
-                        STATE <= ST_sram1;
-                    end
-                    LB:begin
-                        STATE <= ST_loadstr1;
-                    end
-                    LH:begin
-                        STATE <= ST_loadstr1;
-                    end
-                    LUI:begin
-                        STATE <= ST_LUI;
-                    end
-                    LW:begin
-                        STATE <= ST_loadstr1;
-                    end
-                    SB:begin
-                        STATE <= ST_loadstr1;
-                    end
-                    SH:begin
-                        STATE <= ST_loadstr1;
-                    end
-                    SLTI:begin
-                        STATE <= ST_SLTI;
-                    end
-                    SW:begin
-                        STATE <= ST_loadstr1;
-                    end
-                    J:begin
-                        STATE <= ST_j;
-                    end
-                    JAL:begin
-                        STATE <= ST_jal1;
-                    end
-                endcase
+            end
+            ST_decode4:begin
+            aluout_load <= 0;
+            case(input_op)
+                R_OPCODE:begin
+                    case(input_funct)
+                        FUN_ADD:begin
+                            STATE <= ST_add;
+                        end
+                        FUN_AND:begin
+                            STATE <= ST_and;
+                        end
+                        FUN_DIV:begin
+                            STATE <= ST_div1;
+                        end
+                        FUN_MULT:begin
+                            STATE <= ST_mult1;
+                        end
+                        FUN_JR:begin
+                            STATE <= ST_jr1;
+                        end
+                        FUN_MFHI:begin
+                            STATE <= ST_mfhi;
+                        end
+                        FUN_MFLO:begin
+                            STATE <= ST_mflo;
+                        end
+                        FUN_SLL:begin
+                            STATE <= ST_ShiftI;
+                            SHIFT_MODE <= ST_SLL;
+                        end
+                        FUN_SLLV:begin
+                            STATE <= ST_ShiftV;
+                            SHIFT_MODE <= ST_SLLV;
+                        end
+                        FUN_SLT:begin
+                            STATE <= ST_ShiftI;
+                            SHIFT_MODE <= ST_SLT;
+                        end
+                        FUN_SRA:begin
+                            STATE <= ST_ShiftI;
+                            SHIFT_MODE <= ST_SRA;
+                        end
+                        FUN_SRAV:begin
+                            STATE <= ST_ShiftV;
+                            SHIFT_MODE <= ST_SRAV;
+                        end
+                        FUN_SRL:begin
+                            STATE <= ST_ShiftI;
+                            SHIFT_MODE <= ST_SRL;
+                        end
+                        FUN_SUB:begin
+                            STATE <= ST_sub;
+                        end
+                        FUN_BREAK:begin
+                            STATE <= ST_BREAK;
+                        end
+                        FUN_RTE:begin
+                            STATE <= ST_RTE;
+                        end 
+                        FUN_XCHG:begin
+                            STATE <= ST_xch1;
+                        end
+                    endcase
+                end
+                ADDI:begin
+                    STATE <= ST_addi;
+                end
+                ADDIU:begin
+                    STATE <= ST_addiu;
+                end
+                BEQ:begin
+                    STATE <= ST_beq;
+                end
+                BNE:begin
+                    STATE <= ST_bne;
+                end
+                BLE:begin
+                    STATE <= ST_ble;
+                end
+                BGT:begin
+                    STATE <= ST_bgt;
+                end
+                SRAM:begin
+                    STATE <= ST_sram1;
+                end
+                LB:begin
+                    STATE <= ST_loadstr1;
+                end
+                LH:begin
+                    STATE <= ST_loadstr1;
+                end
+                LUI:begin
+                    STATE <= ST_LUI;
+                end
+                LW:begin
+                    STATE <= ST_loadstr1;
+                end
+                SB:begin
+                    STATE <= ST_loadstr1;
+                end
+                SH:begin
+                    STATE <= ST_loadstr1;
+                end
+                SLTI:begin
+                    STATE <= ST_SLTI;
+                end
+                SW:begin
+                    STATE <= ST_loadstr1;
+                end
+                J:begin
+                    STATE <= ST_j;
+                end
+                JAL:begin
+                    STATE <= ST_jal1;
+                end
+            endcase
             end
             ST_and:begin
                 STATE <= ST_save011;
-                sel_alusrca <= 2'd1;
-                sel_alusrcb <= 2'd0;
+                sel_alusrca <= 1;
+                sel_alusrcb <= 2'b0;
                 sel_aluop <= 3'b011;
                 aluout_load <= 1;
             end
             ST_add:begin
                 STATE <= ST_save011;
-                sel_alusrca <= 2'd1;
-                sel_alusrcb <= 2'd0;
+                sel_alusrca <= 1;
+                sel_alusrcb <= 2'b0;
                 sel_aluop <= 3'b001;
                 aluout_load <= 1;
             end
             ST_sub:begin
                 STATE <= ST_save011;
-                sel_alusrca <= 2'd1;
-                sel_alusrcb <= 2'd0;
+                sel_alusrca <= 1;
+                sel_alusrcb <= 2'b0;
                 sel_aluop <= 3'b010;
                 aluout_load <= 1;
             end
             ST_addi:begin
                 STATE <= ST_save000;
-                sel_alusrca <= 2'd1;
-                sel_alusrcb <= 2'd2;
+                sel_alusrca <= 1;
+                sel_alusrcb <= 2'b10;
                 sel_aluop <= 3'b001;
                 aluout_load <= 1;
             end
             ST_addiu:begin
                 STATE <= ST_save000;
-                sel_alusrca <= 2'd1;
-                sel_alusrcb <= 2'd2;
+                sel_alusrca <= 1;
+                sel_alusrcb <= 2'b10;
                 sel_aluop <= 3'b001;
                 aluout_load <= 1;
             end
@@ -519,14 +527,14 @@ always @(posedge clk) begin
                 STATE <= ST_fetch1;
                 aluout_load <= 0;
                 sel_regDst <= 3'b011;
-                sel_mux_mem_to_reg <= 4'd0;
+                sel_mux_mem_to_reg <= 4'b0;
                 regwrite <= 1;
             end
             ST_save000:begin
                 STATE <= ST_fetch1;
                 aluout_load <= 0;
                 sel_regDst <= 3'b000;
-                sel_mux_mem_to_reg <= 4'd0;
+                sel_mux_mem_to_reg <= 4'b0;
                 regwrite <= 1;
             end
             ST_jal1:begin

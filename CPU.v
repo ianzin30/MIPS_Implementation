@@ -285,7 +285,7 @@ or BranchorPc(PC_SIGNAL, PC_write, branchwrite);
     );
 
     mux_mem_to_reg MUX_MEM_TO_REG(
-        ALU_out,
+        ALUOut_Out,
         load_size_out,
         Hi_Out,
         Lo_Out,
@@ -299,8 +299,8 @@ or BranchorPc(PC_SIGNAL, PC_write, branchwrite);
 
     mux_RegDst MUX_RegDst(
         sel_regDst,
-        instr25_21,
         instr20_16,
+        instr25_21,
         instr15_11,
         regdst_out
     );
@@ -485,7 +485,8 @@ or BranchorPc(PC_SIGNAL, PC_write, branchwrite);
         .ls_control_1(LSControl1),
         .ls_control_2(LSControl2),
         .ss_control_1(SSControl1),
-        .ss_control_2(SSControl2)
+        .ss_control_2(SSControl2),
+        .reset_out(reset)
     );
     
 endmodule
