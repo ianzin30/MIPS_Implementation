@@ -140,7 +140,6 @@ parameter ST_mflo = 7'd25;
 parameter ST_xch1 = 7'd26;
 parameter ST_xch2 = 7'd27;
 parameter ST_xch3 = 7'd28;
-parameter ST_xch4 = 7'd29;
 
 parameter ST_sram1 = 7'd30;
 parameter ST_sram2 = 7'd31;
@@ -241,6 +240,7 @@ always @(posedge clk) begin
     end else begin
         case(STATE)
             ST_fetch1:begin
+                regwrite <= 0;
                 STATE <= ST_fetch2;
                 sel_mux_iord <= 3'b0;
                 wr <= 0;
@@ -259,7 +259,6 @@ always @(posedge clk) begin
                 PC_write <= 0;
                 sel_ir <= 1;
                 sel_regread <= 0;
-                regwrite <= 0;
             end
             ST_decode2:begin
                 STATE <= ST_decode3;
@@ -662,22 +661,19 @@ always @(posedge clk) begin
                 STATE <= ST_xch2;
                 sel_alusrca <= 1;
                 sel_aluop <= 3'b000;
-                sel_mux_mem_to_reg <= 4'b0000;
                 aluout_load <= 1;
             end
             ST_xch2:begin
                 STATE <= ST_xch3;
+                aluout_load <= 0;
+                sel_mux_mem_to_reg <= 4'b0000;
                 sel_regDst <= 3'b000;
                 regwrite <= 1;
             end
             ST_xch3:begin
-                STATE <= ST_xch4;
-                sel_mux_mem_to_reg <= 4'b0111;
-            end
-            ST_xch4:begin
                 STATE <= ST_fetch1;
+                sel_mux_mem_to_reg <= 4'b0111;
                 sel_regDst <= 3'b100;
-                regwrite <= 1;
             end
             ST_sram1:begin
                 STATE <= ST_sram2;
