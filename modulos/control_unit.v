@@ -128,12 +128,10 @@ parameter ST_jr1 = 7'd17;
 parameter ST_jr2 = 7'd18;
 
 parameter ST_div1 = 7'd19;
-parameter ST_div2 = 7'd43;
 parameter ST_div3 = 7'd20;
 parameter ST_DP0_1 = 7'd21;   // divisao por zero
 
 parameter ST_mult1 = 7'd22;
-parameter ST_mult2 = 7'd44;
 parameter ST_mult3 = 7'd23;
 
 parameter ST_mfhi = 7'd24;
@@ -196,6 +194,8 @@ parameter ST_waiting1 = 7'd70;
 parameter ST_waiting2 = 7'd71;
 
 parameter ST_decode4 = 7'd72;
+parameter ST_div2 = 7'd73;
+parameter ST_mult2 = 7'd74;
 
 reg [6:0] STATE;
 reg [5:0] SHIFT_MODE;
@@ -244,6 +244,7 @@ always @(posedge clk) begin
                 STATE <= ST_fetch2;
                 sel_mux_iord <= 3'b0;
                 wr <= 0;
+                HiLo_load <= 0;
             end
             ST_fetch2:begin
                 STATE <= ST_decode1;
@@ -266,6 +267,7 @@ always @(posedge clk) begin
                 AB_load <= 1;
             end
             ST_decode3:begin
+                STATE <= ST_decode4;
                 sel_alusrca <= 0;
                 sel_alusrcb <= 2'b11;
                 sel_aluop <= 3'b001;
@@ -635,7 +637,7 @@ always @(posedge clk) begin
             ST_mult2:begin
                 mult_control <= 0;
                 if(mult_stop)begin
-                    STATE <= ST_div3;
+                    STATE <= ST_mult3;
                 end
             end
             ST_mult3:begin
