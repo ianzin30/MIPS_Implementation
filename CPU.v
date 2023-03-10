@@ -87,7 +87,6 @@ module CPU(
     wire [4:0]  instr20_16;
     wire [15:0] instr15_00;
     wire [25:0] instr25_00;
-    wire [4:0]  instr15_11;
 
 // Data wires 5 bits
     wire [4:0]  out_shift_amt;
@@ -109,7 +108,6 @@ module CPU(
     wire [31:0] StoreSize_out;          // saida do store size
     wire [31:0] ALU_out;                // saida da ALU
     wire [31:0] ALUOut_Out;             // saida da ALUOut
-    wire [31:0] alu_result;             // saida da alu
     wire [31:0] HiSelect_out;           // saida do mux Hiselect
     wire [31:0] Hi_Out;                 // saida de Hi
     wire [31:0] LoSelect_out;           // saida do mux Loselect
@@ -261,7 +259,7 @@ or BranchorPc(PC_SIGNAL, PC_write, branchwrite);
     );
     
     mux_pc_source MUX_pc_source(
-        alu_result,
+        ALU_out,
         ALUOut_Out,
         shift_left_2_pc_out,
         EPC_out,
@@ -286,7 +284,7 @@ or BranchorPc(PC_SIGNAL, PC_write, branchwrite);
     );
 
     mux_mem_to_reg MUX_MEM_TO_REG(
-        ALU_out,
+        ALUOut_Out,
         load_size_out,
         Hi_Out,
         Lo_Out,
@@ -300,9 +298,9 @@ or BranchorPc(PC_SIGNAL, PC_write, branchwrite);
 
     mux_RegDst MUX_RegDst(
         sel_regDst,
-        instr25_21,
         instr20_16,
-        instr15_11,
+        instr15_00,
+        instr25_21,
         regdst_out
     );
 
@@ -409,8 +407,8 @@ or BranchorPc(PC_SIGNAL, PC_write, branchwrite);
         output_b,
         DIV_hi_out,
         DIV_lo_out,
-        div_zero,
-        div_stop
+        div_stop,
+        div_zero
     );
 
     mult MULT(
@@ -486,7 +484,8 @@ or BranchorPc(PC_SIGNAL, PC_write, branchwrite);
         .ls_control_1(LSControl1),
         .ls_control_2(LSControl2),
         .ss_control_1(SSControl1),
-        .ss_control_2(SSControl2)
+        .ss_control_2(SSControl2),
+        .reset_out(reset)
     );
     
 endmodule

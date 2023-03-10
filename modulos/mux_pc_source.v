@@ -13,10 +13,10 @@ module mux_pc_source(
         case(select)
             3'b000: out = in_000;
             3'b001: out = in_001;
-            3'b010: out = in_010;
+            3'b010: out = {{4'd0},in_010};
             3'b011: out = 32'b0;
             3'b100: out = in_100;
-            3'b101: out = in_101;
+            3'b101: out = {{31'd0},in_101};
             3'b110: out = in_110;
             3'b111: out = 32'b0; 
         endcase

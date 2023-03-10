@@ -4,8 +4,8 @@ module div(
     input wire div_control, // sinal para iniciar a divisão
     input signed [31:0] A, // input A
     input signed [31:0] B, // input B
-    output reg signed [31:0] hi,  // resto
-    output reg signed [31:0] lo, // quociente
+    output reg [31:0] hi,  // resto
+    output reg [31:0] lo, // quociente
     output reg div_stop, // indica fim da divisão
     output reg div_zero // indica divisão por 0
 );
@@ -17,6 +17,7 @@ reg signed [31:0] resto; // registrador do resto
 reg quociente_negativo; // caso os números tenham sinais diferentes
 reg resto_negativo; // caso o dividendo seja negativo
 integer contador = 31; // contador para iterar pelos bits do número
+
 
 always @(posedge clk or posedge reset) 
     begin
@@ -52,6 +53,7 @@ always @(posedge clk or posedge reset)
                 if (divisor == 32'b0)
                     begin
                         div_zero = 1;
+                        div_stop = 1;
                         contador = -1;
                     end
                 else
@@ -114,8 +116,10 @@ always @(posedge clk or posedge reset)
                 resto_negativo = 0;
             end
 
-        contador = contador - 1;
-            
+        if(div_stop == 0)
+            begin
+                contador = contador - 1;
+            end  
         
     end
 
