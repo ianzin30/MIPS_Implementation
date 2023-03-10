@@ -546,6 +546,7 @@ always @(posedge clk) begin
             end
             ST_jal2:begin
                 STATE <= ST_j;
+                aluout_load <= 0;
                 sel_mux_mem_to_reg <= 4'b0;
                 sel_regDst <= 3'b010;
                 regwrite <= 1;

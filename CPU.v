@@ -380,7 +380,10 @@ or BranchorPc(PC_SIGNAL, PC_write, branchwrite);
     );
 
     shift_left_2_PC Shift_left_2_PC(
-        instr25_00,
+        PC_Out,
+        instr25_21,
+        instr20_16,
+        instr15_00,
         shift_left_2_pc_out
     );
     
