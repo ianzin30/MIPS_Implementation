@@ -241,6 +241,8 @@ always @(posedge clk) begin
         case(STATE)
             ST_fetch1:begin
                 regwrite <= 0;
+                PC_write <= 0;
+                PC_WriteCond <= 0;
                 STATE <= ST_fetch2;
                 sel_mux_iord <= 3'b0;
                 wr <= 0;
@@ -268,6 +270,7 @@ always @(posedge clk) begin
             ST_decode3:begin
                 STATE <= ST_decode4;
                 sel_alusrca <= 0;
+                AB_load <= 0;
                 sel_alusrcb <= 2'b11;
                 sel_aluop <= 3'b001;
                 aluout_load <= 1;
@@ -426,6 +429,7 @@ always @(posedge clk) begin
             end
             ST_j:begin
                 STATE <= ST_fetch1;
+                regwrite <= 0;
                 sel_pc_source <= 3'b010;
                 PC_write <= 1;
             end
