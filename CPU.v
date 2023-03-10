@@ -87,7 +87,6 @@ module CPU(
     wire [4:0]  instr20_16;
     wire [15:0] instr15_00;
     wire [25:0] instr25_00;
-    wire [4:0]  instr15_11;
 
 // Data wires 5 bits
     wire [4:0]  out_shift_amt;
@@ -300,8 +299,8 @@ or BranchorPc(PC_SIGNAL, PC_write, branchwrite);
     mux_RegDst MUX_RegDst(
         sel_regDst,
         instr20_16,
+        instr15_00,
         instr25_21,
-        instr15_11,
         regdst_out
     );
 
