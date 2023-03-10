@@ -109,7 +109,6 @@ module CPU(
     wire [31:0] StoreSize_out;          // saida do store size
     wire [31:0] ALU_out;                // saida da ALU
     wire [31:0] ALUOut_Out;             // saida da ALUOut
-    wire [31:0] alu_result;             // saida da alu
     wire [31:0] HiSelect_out;           // saida do mux Hiselect
     wire [31:0] Hi_Out;                 // saida de Hi
     wire [31:0] LoSelect_out;           // saida do mux Loselect
@@ -261,7 +260,7 @@ or BranchorPc(PC_SIGNAL, PC_write, branchwrite);
     );
     
     mux_pc_source MUX_pc_source(
-        alu_result,
+        ALU_out,
         ALUOut_Out,
         shift_left_2_pc_out,
         EPC_out,
