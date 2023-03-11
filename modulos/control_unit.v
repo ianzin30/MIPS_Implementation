@@ -195,8 +195,7 @@ parameter ST_waiting2 = 7'd71;
 parameter ST_decode4 = 7'd72;
 parameter ST_div2 = 7'd73;
 parameter ST_mult2 = 7'd74;
-    
-parameter ST_overflow = 7'd75;
+   
 parameter ST_overflow2 = 7'd76;
 
 reg [6:0] STATE;
