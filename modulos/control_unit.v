@@ -500,6 +500,7 @@ always @(posedge clk) begin
             end
             ST_ShiftI:begin
                 STATE <= SHIFT_MODE;
+                sel_shift_amt <= 2'b00;
                 sel_shift_src <= 1'b0;
                 sel_shift_reg <= 3'b001;
             end
@@ -513,17 +514,14 @@ always @(posedge clk) begin
             end
             ST_SLL:begin
                 STATE <= ST_ShiftS;
-                sel_shift_amt <= 2'b00;
                 sel_shift_reg <= 3'b010;
             end
             ST_SRA:begin
                 STATE <= ST_ShiftS;
-                sel_shift_amt <= 2'b00;
                 sel_shift_reg <= 3'b100;
             end
             ST_SRL:begin
                 STATE <= ST_ShiftS;
-                sel_shift_amt <= 2'b00;
                 sel_shift_reg <= 3'b011;
             end
             ST_ShiftS:begin
