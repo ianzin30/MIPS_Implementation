@@ -196,8 +196,8 @@ parameter ST_decode4 = 7'd72;
 parameter ST_div2 = 7'd73;
 parameter ST_mult2 = 7'd74;
     
-parameter overflow = 7'd75;
-parameter overflow2 = 7'd76;
+parameter ST_overflow = 7'd75;
+parameter ST_overflow2 = 7'd76;
 
 reg [6:0] STATE;
 reg [5:0] SHIFT_MODE;
@@ -404,7 +404,7 @@ always @(posedge clk) begin
             end
             ST_add:begin
                 if (overflow) begin
-                    STATE <= overflow;
+                    STATE <= ST_overflow;
                 end
                 else 
                 begin
@@ -417,7 +417,7 @@ always @(posedge clk) begin
             end
             ST_sub:begin
                 if (overflow) begin
-                    STATE <= overflow;
+                    STATE <= ST_overflow;
                 end
                 else 
                 begin
@@ -430,7 +430,7 @@ always @(posedge clk) begin
             end
             ST_addi:begin
                 if (overflow) begin
-                    STATE <= overflow;
+                    STATE <= ST_overflow;
                 end else begin
                 STATE <= ST_save000;
                 sel_alusrca <= 1;
@@ -818,6 +818,18 @@ always @(posedge clk) begin
             end
             default:begin
                 STATE <= ST_IOP;
+            end
+            ST_overflow:begin
+                STATE <= ST_overflow2;
+                sel_alusrca <= 0;
+                sel_alusrcb <= 2'b01;
+                sel_aluop <= 3'b010;
+                EPC_load <= 1;
+            end
+            ST_overflow2:begin
+                STATE <= ST_trat2;
+                sel_mux_iord <= 3'b011;
+                wr <= 0;
             end
         endcase
     end
