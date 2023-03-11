@@ -195,6 +195,9 @@ parameter ST_waiting2 = 7'd71;
 parameter ST_decode4 = 7'd72;
 parameter ST_div2 = 7'd73;
 parameter ST_mult2 = 7'd74;
+    
+parameter overflow = 7'd75;
+parameter overflow2 = 7'd76;
 
 reg [6:0] STATE;
 reg [5:0] SHIFT_MODE;
@@ -400,25 +403,41 @@ always @(posedge clk) begin
                 aluout_load <= 1;
             end
             ST_add:begin
-                STATE <= ST_save011;
-                sel_alusrca <= 1;
-                sel_alusrcb <= 2'b0;
-                sel_aluop <= 3'b001;
-                aluout_load <= 1;
+                if (overflow) begin
+                    STATE <= overflow;
+                end
+                else 
+                begin
+                    STATE <= ST_save011;
+                    sel_alusrca <= 1;
+                    sel_alusrcb <= 2'b0;
+                    sel_aluop <= 3'b001;
+                    aluout_load <= 1;
+                end
             end
             ST_sub:begin
-                STATE <= ST_save011;
-                sel_alusrca <= 1;
-                sel_alusrcb <= 2'b0;
-                sel_aluop <= 3'b010;
-                aluout_load <= 1;
+                if (overflow) begin
+                    STATE <= overflow;
+                end
+                else 
+                begin
+                    STATE <= ST_save011;
+                    sel_alusrca <= 1;
+                    sel_alusrcb <= 2'b0;
+                    sel_aluop <= 3'b010;
+                    aluout_load <= 1;
+                end
             end
             ST_addi:begin
+                if (overflow) begin
+                    STATE <= overflow;
+                end else begin
                 STATE <= ST_save000;
                 sel_alusrca <= 1;
                 sel_alusrcb <= 2'b10;
                 sel_aluop <= 3'b001;
                 aluout_load <= 1;
+                end
             end
             ST_addiu:begin
                 STATE <= ST_save000;
