@@ -547,7 +547,7 @@ always @(posedge clk) begin
                 end
             end
             ST_save000:begin
-                if (overflow) begin
+                if (overflow && input_funct == ADDI) begin
                     STATE <= ST_overflow;
                 end
                 else 
