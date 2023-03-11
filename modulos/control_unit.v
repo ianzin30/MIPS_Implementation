@@ -482,7 +482,7 @@ always @(posedge clk) begin
             end
             ST_BREAK:begin
                 STATE <= ST_fetch1;
-                sel_alusrca <= 1'b1;
+                sel_alusrca <= 1'b0;
                 sel_alusrcb <= 2'b01;
                 sel_aluop <= 3'b010;
                 sel_pc_source <= 3'b000;
