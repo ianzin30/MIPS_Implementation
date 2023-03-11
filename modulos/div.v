@@ -116,10 +116,11 @@ always @(posedge clk or posedge reset)
                 resto_negativo = 0;
             end
 
-        if(div_stop == 0)
+        contador = contador - 1;
+        if(contador == -3)
             begin
-                contador = contador - 1;
-            end  
+                div_stop = 0;
+            end
         
     end
 
