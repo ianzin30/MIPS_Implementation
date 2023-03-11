@@ -714,7 +714,7 @@ always @(posedge clk) begin
             end
             ST_sram4:begin
                 STATE <= ST_sram5;
-                sel_shift_reg <= 100;
+                sel_shift_reg <= 3'b100;
             end
             ST_sram5:begin
                 STATE <= ST_fetch1;
