@@ -402,41 +402,25 @@ always @(posedge clk) begin
                 aluout_load <= 1;
             end
             ST_add:begin
-                if (overflow) begin
-                    STATE <= ST_overflow;
-                end
-                else 
-                begin
-                    STATE <= ST_save011;
-                    sel_alusrca <= 1;
-                    sel_alusrcb <= 2'b0;
-                    sel_aluop <= 3'b001;
-                    aluout_load <= 1;
-                end
+                STATE <= ST_save011;
+                sel_alusrca <= 1;
+                sel_alusrcb <= 2'b0;
+                sel_aluop <= 3'b001;
+                aluout_load <= 1;
             end
             ST_sub:begin
-                if (overflow) begin
-                    STATE <= ST_overflow;
-                end
-                else 
-                begin
-                    STATE <= ST_save011;
-                    sel_alusrca <= 1;
-                    sel_alusrcb <= 2'b0;
-                    sel_aluop <= 3'b010;
-                    aluout_load <= 1;
-                end
+                STATE <= ST_save011;
+                sel_alusrca <= 1;
+                sel_alusrcb <= 2'b0;
+                sel_aluop <= 3'b010;
+                aluout_load <= 1;
             end
             ST_addi:begin
-                if (overflow) begin
-                    STATE <= ST_overflow;
-                end else begin
                 STATE <= ST_save000;
                 sel_alusrca <= 1;
                 sel_alusrcb <= 2'b10;
                 sel_aluop <= 3'b001;
                 aluout_load <= 1;
-                end
             end
             ST_addiu:begin
                 STATE <= ST_save000;
@@ -550,18 +534,30 @@ always @(posedge clk) begin
                 regwrite <=1;
             end
             ST_save011:begin
+                if (overflow) begin
+                    STATE <= ST_overflow;
+                end
+                else 
+                begin
                 STATE <= ST_fetch1;
                 aluout_load <= 0;
                 sel_regDst <= 3'b011;
                 sel_mux_mem_to_reg <= 4'b0;
                 regwrite <= 1;
+                end
             end
             ST_save000:begin
+                if (overflow) begin
+                    STATE <= ST_overflow;
+                end
+                else 
+                begin
                 STATE <= ST_fetch1;
                 aluout_load <= 0;
                 sel_regDst <= 3'b000;
                 sel_mux_mem_to_reg <= 4'b0;
                 regwrite <= 1;
+                end
             end
             ST_jal1:begin
                 STATE <= ST_jal2;
