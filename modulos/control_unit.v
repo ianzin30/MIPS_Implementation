@@ -467,6 +467,7 @@ always @(posedge clk) begin
                 sel_aluop <= 3'b111;
                 sel_mux_mem_to_reg <= 4'b1000;
                 sel_regDst <= 3'b011;
+                regwrite <=1;
             end
             ST_SLTI:begin
                 STATE <= ST_fetch1;
@@ -474,7 +475,8 @@ always @(posedge clk) begin
                 sel_alusrcb <= 2'b10;
                 sel_aluop <= 3'b111;
                 sel_mux_mem_to_reg <= 4'b1000;
-                sel_regDst <= 3'b011;
+                sel_regDst <= 3'b000;
+                regwrite <=1;
             end
             ST_BREAK:begin
                 STATE <= ST_fetch1;
@@ -490,43 +492,44 @@ always @(posedge clk) begin
             end
             ST_ShiftV:begin
                 STATE <= SHIFT_MODE;
-                sel_shift_src <= 1'b0;
+                sel_shift_src <= 1'b1;
                 sel_shift_reg <= 3'b001;
+                sel_shift_amt <= 2'b01;
             end
             ST_ShiftI:begin
                 STATE <= SHIFT_MODE;
-                sel_shift_src <= 1'b1;
+                sel_shift_src <= 1'b0;
                 sel_shift_reg <= 3'b001;
             end
             ST_SLLV:begin
                 STATE <= ST_ShiftS;
-                sel_shift_amt <= 2'b00;
                 sel_shift_reg <= 3'b010;
             end
             ST_SRAV:begin
                 STATE <= ST_ShiftS;
-                sel_shift_amt <= 2'b00;
                 sel_shift_reg <= 3'b100;
             end
             ST_SLL:begin
                 STATE <= ST_ShiftS;
-                sel_shift_amt <= 2'b01;
+                sel_shift_amt <= 2'b00;
                 sel_shift_reg <= 3'b010;
             end
             ST_SRA:begin
                 STATE <= ST_ShiftS;
-                sel_shift_amt <= 2'b01;
+                sel_shift_amt <= 2'b00;
                 sel_shift_reg <= 3'b100;
             end
             ST_SRL:begin
                 STATE <= ST_ShiftS;
-                sel_shift_amt <= 2'b01;
+                sel_shift_amt <= 2'b00;
                 sel_shift_reg <= 3'b011;
             end
             ST_ShiftS:begin
                 STATE <= ST_fetch1;
                 sel_mux_mem_to_reg <= 4'b0100;
-                 sel_regDst <= 3'b011;
+                sel_regDst <= 3'b011;
+                sel_shift_reg <= 3'b000;
+                regwrite <=1;
             end
             ST_save011:begin
                 STATE <= ST_fetch1;
