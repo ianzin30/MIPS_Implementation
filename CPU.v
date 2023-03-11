@@ -228,7 +228,7 @@ or BranchorPc(PC_SIGNAL, PC_write, branchwrite);
     );
 
     mux_shift_amt MUX_shift_amt(
-        instr15_00,
+        instr15_00[10:6],
         output_b,
         MEM_out,
         sel_shift_amt,
@@ -291,7 +291,7 @@ or BranchorPc(PC_SIGNAL, PC_write, branchwrite);
         output_shift,
         shift_left_16_out,
         output_b,
-        sign_extend_1_32_out,
+        lt_extended,
         sel_mux_mem_to_reg,
         memtoreg_out
     );
