@@ -687,27 +687,29 @@ always @(posedge clk) begin
                 sel_alusrca <= 1;
                 sel_alusrcb <= 2'b10;
                 sel_aluop <= 3'b001;
-            end
-            ST_sram2:begin
-                STATE <= ST_sram3;
                 sel_mux_iord <= 3'b001;
                 wr <= 0;
             end
+            ST_sram2:begin
+                STATE <= ST_sram3;
+                sel_shift_amt <= 2'b10;
+                sel_shift_src <= 0;
+                sel_shift_reg <= 3'b001;
+            end
             ST_sram3:begin
                 STATE <= ST_sram4;
-                sel_shift_src <= 1;
             end
             ST_sram4:begin
                 STATE <= ST_sram5;
-                sel_shift_amt <= 2'b10;
-                sel_shift_reg <= 3'b100;
+                sel_shift_reg <= 100;
             end
             ST_sram5:begin
                 STATE <= ST_fetch1;
                 sel_mux_mem_to_reg <= 4'b0100;
                 sel_regDst <= 3'b000;
-                regwrite <= 1;
-            end   
+                sel_shift_reg <= 3'b000;
+                regwrite <=1;
+            end 
             ST_LUI:begin
                 STATE <= ST_fetch1;
                 sel_mux_mem_to_reg <= 4'b0110;
