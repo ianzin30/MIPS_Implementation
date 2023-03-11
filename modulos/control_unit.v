@@ -547,11 +547,9 @@ always @(posedge clk) begin
                 end
             end
             ST_save000:begin
-                if (overflow) begin
+                if (overflow && (input_op == ADDI)) begin
                     STATE <= ST_overflow;
-                end
-                else 
-                begin
+                end else begin
                 STATE <= ST_fetch1;
                 aluout_load <= 0;
                 sel_regDst <= 3'b000;
