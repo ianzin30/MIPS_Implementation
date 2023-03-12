@@ -280,6 +280,9 @@ always @(posedge clk) begin
             ST_decode4:begin
             aluout_load <= 0;
             case(input_op)
+                default:begin
+                    STATE <= ST_IOP;
+                end
                 R_OPCODE:begin
                     case(input_funct)
                         FUN_ADD:begin
@@ -444,6 +447,7 @@ always @(posedge clk) begin
             end
             ST_trat1:begin
                 STATE <= ST_trat2;
+                EPC_load <= 0;
                 sel_mux_iord <= 3'b010;
                 wr <= 0;
             end
@@ -459,6 +463,7 @@ always @(posedge clk) begin
                 sel_pc_source <= 3'b110;
             end
             ST_trat4:begin
+                MDR_load <= 0;
                 STATE <= ST_fetch1;
                 PC_write <= 1;
             end
@@ -644,6 +649,7 @@ always @(posedge clk) begin
             end
             ST_DP0_2:begin
                 STATE <= ST_trat2;
+                EPC_load <= 0;
                 sel_mux_iord <= 3'b100;
                 wr <= 0;
             end
@@ -812,9 +818,6 @@ always @(posedge clk) begin
             ST_waiting2:begin
                 STATE <= ST_fetch1;
             end
-            default:begin
-                STATE <= ST_IOP;
-            end
             ST_overflow:begin
                 STATE <= ST_overflow2;
                 sel_alusrca <= 0;
@@ -824,6 +827,7 @@ always @(posedge clk) begin
             end
             ST_overflow2:begin
                 STATE <= ST_trat2;
+                EPC_load <= 0;
                 sel_mux_iord <= 3'b011;
                 wr <= 0;
             end
