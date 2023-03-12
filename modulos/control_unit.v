@@ -280,6 +280,9 @@ always @(posedge clk) begin
             ST_decode4:begin
             aluout_load <= 0;
             case(input_op)
+                default:begin
+                    STATE <= ST_IOP;
+                end
                 R_OPCODE:begin
                     case(input_funct)
                         FUN_ADD:begin
@@ -814,9 +817,6 @@ always @(posedge clk) begin
             end
             ST_waiting2:begin
                 STATE <= ST_fetch1;
-            end
-            default:begin
-                STATE <= ST_IOP;
             end
             ST_overflow:begin
                 STATE <= ST_overflow2;
