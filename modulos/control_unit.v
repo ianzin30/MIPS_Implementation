@@ -195,6 +195,8 @@ parameter ST_waiting2 = 7'd71;
 parameter ST_decode4 = 7'd72;
 parameter ST_div2 = 7'd73;
 parameter ST_mult2 = 7'd74;
+   
+parameter ST_overflow2 = 7'd76;
 
 reg [6:0] STATE;
 reg [5:0] SHIFT_MODE;
@@ -241,6 +243,8 @@ always @(posedge clk) begin
         case(STATE)
             ST_fetch1:begin
                 regwrite <= 0;
+                PC_write <= 0;
+                PC_WriteCond <= 0;
                 STATE <= ST_fetch2;
                 sel_mux_iord <= 3'b0;
                 wr <= 0;
@@ -268,6 +272,7 @@ always @(posedge clk) begin
             ST_decode3:begin
                 STATE <= ST_decode4;
                 sel_alusrca <= 0;
+                AB_load <= 0;
                 sel_alusrcb <= 2'b11;
                 sel_aluop <= 3'b001;
                 aluout_load <= 1;
@@ -275,6 +280,9 @@ always @(posedge clk) begin
             ST_decode4:begin
             aluout_load <= 0;
             case(input_op)
+                default:begin
+                    STATE <= ST_IOP;
+                end
                 R_OPCODE:begin
                     case(input_funct)
                         FUN_ADD:begin
@@ -426,6 +434,7 @@ always @(posedge clk) begin
             end
             ST_j:begin
                 STATE <= ST_fetch1;
+                regwrite <= 0;
                 sel_pc_source <= 3'b010;
                 PC_write <= 1;
             end
@@ -438,6 +447,7 @@ always @(posedge clk) begin
             end
             ST_trat1:begin
                 STATE <= ST_trat2;
+                EPC_load <= 0;
                 sel_mux_iord <= 3'b010;
                 wr <= 0;
             end
@@ -453,6 +463,7 @@ always @(posedge clk) begin
                 sel_pc_source <= 3'b110;
             end
             ST_trat4:begin
+                MDR_load <= 0;
                 STATE <= ST_fetch1;
                 PC_write <= 1;
             end
@@ -463,6 +474,7 @@ always @(posedge clk) begin
                 sel_aluop <= 3'b111;
                 sel_mux_mem_to_reg <= 4'b1000;
                 sel_regDst <= 3'b011;
+                regwrite <=1;
             end
             ST_SLTI:begin
                 STATE <= ST_fetch1;
@@ -470,7 +482,8 @@ always @(posedge clk) begin
                 sel_alusrcb <= 2'b10;
                 sel_aluop <= 3'b111;
                 sel_mux_mem_to_reg <= 4'b1000;
-                sel_regDst <= 3'b011;
+                sel_regDst <= 3'b000;
+                regwrite <=1;
             end
             ST_BREAK:begin
                 STATE <= ST_fetch1;
@@ -486,57 +499,66 @@ always @(posedge clk) begin
             end
             ST_ShiftV:begin
                 STATE <= SHIFT_MODE;
-                sel_shift_src <= 1'b0;
+                sel_shift_src <= 1'b1;
                 sel_shift_reg <= 3'b001;
+                sel_shift_amt <= 2'b01;
             end
             ST_ShiftI:begin
                 STATE <= SHIFT_MODE;
-                sel_shift_src <= 1'b1;
+                sel_shift_amt <= 2'b00;
+                sel_shift_src <= 1'b0;
                 sel_shift_reg <= 3'b001;
             end
             ST_SLLV:begin
                 STATE <= ST_ShiftS;
-                sel_shift_amt <= 2'b00;
                 sel_shift_reg <= 3'b010;
             end
             ST_SRAV:begin
                 STATE <= ST_ShiftS;
-                sel_shift_amt <= 2'b00;
                 sel_shift_reg <= 3'b100;
             end
             ST_SLL:begin
                 STATE <= ST_ShiftS;
-                sel_shift_amt <= 2'b01;
                 sel_shift_reg <= 3'b010;
             end
             ST_SRA:begin
                 STATE <= ST_ShiftS;
-                sel_shift_amt <= 2'b01;
                 sel_shift_reg <= 3'b100;
             end
             ST_SRL:begin
                 STATE <= ST_ShiftS;
-                sel_shift_amt <= 2'b01;
                 sel_shift_reg <= 3'b011;
             end
             ST_ShiftS:begin
                 STATE <= ST_fetch1;
                 sel_mux_mem_to_reg <= 4'b0100;
-                 sel_regDst <= 3'b011;
+                sel_regDst <= 3'b011;
+                sel_shift_reg <= 3'b000;
+                regwrite <=1;
             end
             ST_save011:begin
+                if (overflow) begin
+                    STATE <= ST_overflow;
+                end
+                else 
+                begin
                 STATE <= ST_fetch1;
                 aluout_load <= 0;
                 sel_regDst <= 3'b011;
                 sel_mux_mem_to_reg <= 4'b0;
                 regwrite <= 1;
+                end
             end
             ST_save000:begin
+                if (overflow && (input_op == ADDI)) begin
+                    STATE <= ST_overflow;
+                end else begin
                 STATE <= ST_fetch1;
                 aluout_load <= 0;
                 sel_regDst <= 3'b000;
                 sel_mux_mem_to_reg <= 4'b0;
                 regwrite <= 1;
+                end
             end
             ST_jal1:begin
                 STATE <= ST_jal2;
@@ -546,6 +568,7 @@ always @(posedge clk) begin
             end
             ST_jal2:begin
                 STATE <= ST_j;
+                aluout_load <= 0;
                 sel_mux_mem_to_reg <= 4'b0;
                 sel_regDst <= 3'b010;
                 regwrite <= 1;
@@ -626,6 +649,7 @@ always @(posedge clk) begin
             end
             ST_DP0_2:begin
                 STATE <= ST_trat2;
+                EPC_load <= 0;
                 sel_mux_iord <= 3'b100;
                 wr <= 0;
             end
@@ -680,27 +704,29 @@ always @(posedge clk) begin
                 sel_alusrca <= 1;
                 sel_alusrcb <= 2'b10;
                 sel_aluop <= 3'b001;
-            end
-            ST_sram2:begin
-                STATE <= ST_sram3;
                 sel_mux_iord <= 3'b001;
                 wr <= 0;
             end
+            ST_sram2:begin
+                STATE <= ST_sram3;
+                sel_shift_amt <= 2'b10;
+                sel_shift_src <= 0;
+                sel_shift_reg <= 3'b001;
+            end
             ST_sram3:begin
                 STATE <= ST_sram4;
-                sel_shift_src <= 1;
             end
             ST_sram4:begin
                 STATE <= ST_sram5;
-                sel_shift_amt <= 2'b10;
                 sel_shift_reg <= 3'b100;
             end
             ST_sram5:begin
                 STATE <= ST_fetch1;
                 sel_mux_mem_to_reg <= 4'b0100;
                 sel_regDst <= 3'b000;
-                regwrite <= 1;
-            end   
+                sel_shift_reg <= 3'b000;
+                regwrite <=1;
+            end 
             ST_LUI:begin
                 STATE <= ST_fetch1;
                 sel_mux_mem_to_reg <= 4'b0110;
@@ -792,8 +818,18 @@ always @(posedge clk) begin
             ST_waiting2:begin
                 STATE <= ST_fetch1;
             end
-            default:begin
-                STATE <= ST_IOP;
+            ST_overflow:begin
+                STATE <= ST_overflow2;
+                sel_alusrca <= 0;
+                sel_alusrcb <= 2'b01;
+                sel_aluop <= 3'b010;
+                EPC_load <= 1;
+            end
+            ST_overflow2:begin
+                STATE <= ST_trat2;
+                EPC_load <= 0;
+                sel_mux_iord <= 3'b011;
+                wr <= 0;
             end
         endcase
     end
