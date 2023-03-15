@@ -1,7 +1,7 @@
 
 /*// Imports dos módulos da Especificação
 
-`include "Banco_reg.vhd"z
+`include "Banco_reg.vhd"
 `include "Instr_Reg.vhd"
 `include "Memoria.vhd"
 `include "RegDesloc.vhd"
